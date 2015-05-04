@@ -44,7 +44,7 @@ class AuthController extends Controller {
             return redirect(action('BackController@index'));
         }
 
-        return redirect(action('AuthController@login'))->withErrors('Wrong username or password');
+        return redirect(action('AuthController@showLogin'))->withErrors('Wrong username or password');
 	}
 
 	/*
