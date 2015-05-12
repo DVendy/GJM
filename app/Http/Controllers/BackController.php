@@ -136,14 +136,14 @@ class BackController extends Controller {
 				'price' => $key->price
 				];
 			}
-			if ($i == 5000){
+			if ($i >= 5000){
 				Product::insert($users);
 				$users = [];
 				$i = 0;
 			}
 			$i++;
 		}
-		//hmmm
+		Product::insert($users);
 
 		$time2 = microtime(true);
 		echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
