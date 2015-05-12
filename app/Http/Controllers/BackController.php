@@ -137,6 +137,7 @@ class BackController extends Controller {
 			}
 		}
 		Product::insert($users);
+		//hmmm
 
 		$time2 = microtime(true);
 echo "script execution time: ". round(($time2-$time1), 2). "<br>"; //value in seconds
