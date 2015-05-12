@@ -85,7 +85,9 @@ class BackController extends Controller {
 
 		set_time_limit(0);
 		$sung = Excel::load(storage_path('excel/exports/').$fileName)->get();
-		
+		$time2 = microtime(true);
+		echo "setelah load excel: ". round(($time2-$time1), 2). "<br>"; //value in seconds
+
 		Product::truncate();
 		Eloquent::unguard();
 		DB::disableQueryLog();
@@ -117,8 +119,7 @@ class BackController extends Controller {
 
 		//die("3. " . memory_get_usage()/1000000 . " MB <br>");
 		
-
-		$users = [];
+		$i = 0;
 		foreach($sung as $key)
 		{
 	        	//echo $key->spec;
@@ -135,12 +136,17 @@ class BackController extends Controller {
 				'price' => $key->price
 				];
 			}
+			if ($i == 5000){
+				Product::insert($users);
+				$users = [];
+				$i = 0;
+			}
+			$i++;
 		}
-		Product::insert($users);
 		//hmmm
 
 		$time2 = microtime(true);
-echo "script execution time: ". round(($time2-$time1), 2). "<br>"; //value in seconds
+		echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
 		die("tanpa chunk. " . memory_get_usage()/1000000 . " MB <br>");
 		return redirect('product');
 	}
