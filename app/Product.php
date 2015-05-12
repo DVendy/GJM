@@ -9,10 +9,10 @@ class Product extends Model {
 	 *
 	 * @var string
 	 */
-	protected $table = 'products';
+	protected $table = 'barang';
 
 	/*
 		Product Properties belongs here.....
 	*/
-
+	protected $fillable = ['itemcode', 'description', 'itemname', 'model', 'spec', 'registrasi', 'kurs', 'price'];
 }

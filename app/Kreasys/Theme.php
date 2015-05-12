@@ -31,7 +31,7 @@ class Theme {
 	public function draw($template){
 		$this->styles = Config::get('theme.'.$this->theme.'.'.$this->part.'.style');
 		$this->headerScripts = Config::get('theme.'.$this->theme.'.'.$this->part.'.script.header');
-		$this->footerScripts = Config::get('theme.'.$this->theme.'.'.$this->part.'.script.footer');		
+		$this->footerScripts = Config::get('theme.'.$this->theme.'.'.$this->part.'.script.footer');	
 
 		return View::make($this->theme.'.'.$this->part.'.'.$template);		
 	}
@@ -48,7 +48,7 @@ class Theme {
 		foreach ($this->headerScripts as $key => $val) {
 			echo HTML::script($key, $val)."\n";
 		}
-	}	
+	}
 
 	public function getFooterScript()
 	{

@@ -1,7 +1,7 @@
 <!-- Navbar -->
 <div class="navbar navbar-inverse" role="navigation">
     <div class="navbar-header">
-        <a class="navbar-brand" href="#"><h4><i>{{ Config::get('global.app_name') }}</i></h4></a>
+        <a class="navbar-brand" href="#"><h4><i>GJM</i></h4></a>
         <a class="sidebar-toggle"><i class="icon-paragraph-justify2"></i></a>
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar"><span class="sr-only">Toggle navigation</span><i class="icon-paragraph-justify2"></i></button>
     </div>

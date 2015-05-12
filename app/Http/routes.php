@@ -16,7 +16,10 @@
 //--- Administrator
 Route::get('/', 'BackController@index');
 Route::get('user', 'BackController@user');
+
 Route::get('product', 'BackController@product');
+Route::post('product', 'BackController@import');
+
 Route::get('news', 'BackController@news');
 
 
