@@ -2,9 +2,7 @@
 
 use Illuminate\Database\Eloquent\Model;
 
-class Upload extends Model implements AuthenticatableContract, CanResetPasswordContract {
-
-	use Authenticatable, CanResetPassword;
+class Upload extends Model{
 
 	/**
 	 * The database table used by the model.
@@ -13,5 +11,5 @@ class Upload extends Model implements AuthenticatableContract, CanResetPasswordC
 	 */
 	protected $table = 'upload';
 
-
+	protected $fillable = ['name', 'date'];
 }

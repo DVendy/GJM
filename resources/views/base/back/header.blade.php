@@ -39,7 +39,7 @@
         <ul class="navigation">
             <li @if(Request::is('/')) class="active" @endif ><a href="{{ action('BackController@index') }}"><span>Dashboard</span> <i class="icon-screen2"></i></a></li>  
             <li @if(Request::is('user*')) class="active" @endif ><a href="{{ action('BackController@user') }}"><span>User</span> <i class="icon-user"></i></a></li>  
-            <li @if(Request::is('product*')) class="active" @endif ><a href="{{ action('BackController@product') }}"><span>Product</span> <i class="icon-list"></i></a></li>  
+            <li @if(Request::is('product*')) class="active" @endif ><a href="{{ URL('product') }}"><span>Product</span> <i class="icon-list"></i></a></li>  
             <li @if(Request::is('news*')) class="active" @endif ><a href="{{ action('BackController@news') }}"><span>News</span> <i class="icon-newspaper"></i></a></li>  
         </ul>
         <!-- /main navigation -->

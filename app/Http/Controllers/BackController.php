@@ -5,9 +5,13 @@ use Carbon\Carbon;
 use Theme;
 use Input;
 use App\Product;
+use App\Upload;
+use App\News;
 use Eloquent;
 use DB;
 use Session;
+
+use Akeneo\Component\SpreadsheetParser\SpreadsheetParser;
 
 class BackController extends Controller {
 
@@ -59,19 +63,80 @@ class BackController extends Controller {
 	 */
 	public function product()
 	{
-		$products = Product::paginate(100);
+		//die("lol");
+		$query = new Product();
+		if (Input::has('code')){
+			$term = Input::get('code');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("itemcode regexp '".$term."'");
+		}
+		if (Input::has('price')){
+			$term = Input::get('price');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("price regexp '".$term."'");
+		}
+		if (Input::has('itemname')){
+			$term = Input::get('itemname');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("itemname regexp '".$term."'");
+		}
+		if (Input::has('description')){
+			$term = Input::get('description');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("description regexp '".$term."'");
+		}
+		if (Input::has('model')){
+			$term = Input::get('model');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("model regexp '".$term."'");
+		}
+		if (Input::has('spec')){
+			$term = Input::get('spec');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("spec regexp '".$term."'");
+		}
+		if (Input::has('registrasi')){
+			$term = Input::get('registrasi');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("registrasi regexp '".$term."'");
+		}
+		if (Input::has('kurs')){
+			$term = Input::get('kurs');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("kurs regexp '".$term."'");
+		}
+
+		$products = $query->paginate(50);
 		$products->setPath('');
-		return Theme::back('product')->with('products', $products);
+		$pagination = $products->appends(array('code' => Input::get('code'),
+			'description' => Input::get('description'),
+			'itemname' => Input::get('itemname'),
+			'model' => Input::get('model'),
+			'spec' => Input::get('spec'),
+			'registrasi' => Input::get('registrasi'),
+			'kurs' => Input::get('kurs'),
+			'price' => Input::get('price')));
+
+		Session::put('progress', 0);
+		Session::save();
+
+		return Theme::back('product')->with('products', $products)->with('pagination', $pagination);
 	}
 
-	public function getProgess() {
-		return Response::json(array(Session::get('progress')));
-	}
-
-	public function import()
+	public function import_new()
 	{
 		//echo("1. " . memory_get_usage()/1000000 . " MB <br>");
 		$time1 = microtime(true);
+		Session::put('progress', "Uploading...");
+		Session::save();
 
 		$date_now = Carbon::now()->addHours(7);
 		$now = $date_now->toDateTimeString();
@@ -83,73 +148,63 @@ class BackController extends Controller {
 		Input::file('file')->move(storage_path('excel/exports'), $fileName);
 		//echo("2. " . memory_get_usage()/1000000 . " MB <br>");
 
+		Session::put('progress', "Processing...");
+		Session::save();
 		set_time_limit(0);
-		$sung = Excel::load(storage_path('excel/exports/').$fileName)->get();
-		$time2 = microtime(true);
-		echo "setelah load excel: ". round(($time2-$time1), 2). "<br>"; //value in seconds
-
+		//put shits HERE
+		
 		Product::truncate();
 		Eloquent::unguard();
 		DB::disableQueryLog();
-		
+		$workbook = SpreadsheetParser::open(storage_path('excel/exports/').$fileName);
 
-		// Excel::filter('chunk')->load(storage_path('excel/exports/').$fileName)->chunk(1000, function($results)
-		// {
-		// 	//echo("per 100 chunk. " . memory_get_usage()/1000000 . " MB <br>");
-		// 	$users = [];
-		// 	foreach($results as $key)
-		// 	{
-	 //        	//echo $key->spec;
-	 //        	//die();
-		// 		if ($key->itemcode != ""){
-		// 			$users[] = [
-		// 			'itemcode' => $key->itemcode,
-		// 			'description' => $key->description,
-		// 			'itemname' => $key->itemname,
-		// 			'model' => $key->model,
-		// 			'spec' => $key->spec,
-		// 			'registrasi' => $key->registrasi,
-		// 			'kurs' => $key->kurs,
-		// 			'price' => $key->price
-		// 			];
-		// 		}
-		// 	}
-		// 	Product::insert($users);
-		// });
-
-		//die("3. " . memory_get_usage()/1000000 . " MB <br>");
-		
+		$myWorksheetIndex = $workbook->getWorksheetIndex('Sheet1');
+		$users = [];
 		$i = 0;
-		foreach($sung as $key)
-		{
-	        	//echo $key->spec;
-	        	//die();
-			if ($key->itemcode != ""){
+		foreach ($workbook->createRowIterator($myWorksheetIndex) as $rowIndex => $values) {
+		    if ($values[0] != "" && $values[0] != "ItemCode"){
 				$users[] = [
-				'itemcode' => $key->itemcode,
-				'description' => $key->description,
-				'itemname' => $key->itemname,
-				'model' => $key->model,
-				'spec' => $key->spec,
-				'registrasi' => $key->registrasi,
-				'kurs' => $key->kurs,
-				'price' => $key->price
+				'itemcode' => $values[0],
+				'description' => $values[1],
+				'itemname' => $values[2],
+				'model' => $values[3],
+				'spec' => $values[4],
+				'registrasi' => $values[5],
+				'kurs' => $values[6],
+				'price' => $values[7]
 				];
 			}
-			if ($i >= 5000){
+			if ($rowIndex % 5000 == 0){
 				Product::insert($users);
 				$users = [];
-				$i = 0;
+			}
+			if ($rowIndex % 100 == 0){
+				Session::put('progress', $i . ' data processed');
+				Session::save();
 			}
 			$i++;
 		}
 		Product::insert($users);
 
+		$upload = new Upload();
+		$upload->name = $fileName;
+		$upload->date = $date_now;
+		$upload->save();
+
+
 		$time2 = microtime(true);
 		echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
-		die("tanpa chunk. " . memory_get_usage()/1000000 . " MB <br>");
+		die("memory sekarang " . memory_get_usage()/1000000 . " MB <br>");
 		return redirect('product');
 	}
+
+	public function export()
+	{
+		$upload = Upload::orderBy('date', 'DESC')->first();
+		$pathToFile = storage_path('excel/exports/').$upload->name;
+		return response()->download($pathToFile);
+	}
+
 	/**
 	 * News
 	 *
@@ -157,8 +212,41 @@ class BackController extends Controller {
 	 */
 	public function news()
 	{
-		$asd = "lol";
-		return Theme::back('news')->with('asd', $asd);
+		$news = News::orderBy('id', 'DESC')->paginate(5);
+		$news->setPath('');
+		return Theme::back('news')->with('news', $news);
+	}
+
+	public function news_create()
+	{
+		//die(Input::get('news'));
+		$news = new News();
+		$news->title = Input::get('title');
+		$news->body = Input::get('body');
+		$news->date = Carbon::now()->addHours(7);
+		$news->save();
+
+		return redirect('news');
+	}
+
+	public function news_edit()
+	{
+		//die(Input::get('id'));
+		$news = News::find(Input::get('id'));
+		$news->title = Input::get('title');
+		$news->body = Input::get('body');
+		$news->save();
+
+		return redirect('news');
+	}
+
+	public function news_delete($id)
+	{
+		//die(Input::get('news'));
+		$news = News::find($id);
+		$news->delete();
+
+		return redirect('news');
 	}
 
 }

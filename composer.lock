@@ -1,11 +1,127 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d44e4ed54057ca83b40a60898c5fcf11",
+    "hash": "b01cd54671366bc6633d87c6b0c9cd24",
     "packages": [
+        {
+            "name": "akeneo/spreadsheet-parser",
+            "version": "v1.1.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/akeneo/spreadsheet-parser.git",
+                "reference": "ef6279fc28e8d2004c83b8e1a15588b0248de21d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/akeneo/spreadsheet-parser/zipball/ef6279fc28e8d2004c83b8e1a15588b0248de21d",
+                "reference": "ef6279fc28e8d2004c83b8e1a15588b0248de21d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "symfony/options-resolver": "2.*"
+            },
+            "require-dev": {
+                "phpspec/phpspec": "2.0.*@dev"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Akeneo\\Component\\SpreadsheetParser\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "OSL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Antoine Guigan",
+                    "email": "antoine@akeneo.com",
+                    "homepage": "http://akeneo.com"
+                },
+                {
+                    "name": "Matthieu Viel",
+                    "email": "matthieu.viel@akeneo.com",
+                    "homepage": "http://akeneo.com"
+                }
+            ],
+            "description": "Akeneo Spreadsheet parser. Reads XLXS files from Microsoft Excel and Open Office",
+            "homepage": "http://akeneo.com",
+            "keywords": [
+                "akeneo",
+                "excel",
+                "parser",
+                "reader",
+                "spreadsheet",
+                "xlsx"
+            ],
+            "time": "2014-09-02 17:35:15"
+        },
+        {
+            "name": "box/spout",
+            "version": "1.0.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/box/spout.git",
+                "reference": "f8f194bc8f3cf448e65585d6c48cdea2e3e417f2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/box/spout/zipball/f8f194bc8f3cf448e65585d6c48cdea2e3e417f2",
+                "reference": "f8f194bc8f3cf448e65585d6c48cdea2e3e417f2",
+                "shasum": ""
+            },
+            "require": {
+                "ext-simplexml": "*",
+                "ext-xmlreader": "*",
+                "ext-zip": "*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": ">=3.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Box\\Spout\\": "src/Spout"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Adrien Loison",
+                    "email": "adrien@box.com"
+                }
+            ],
+            "description": "PHP Library to read and write CSV and XLSX files, in a fast and scalable way",
+            "homepage": "https://www.github.com/box/spout",
+            "keywords": [
+                "OOXML",
+                "csv",
+                "excel",
+                "memory",
+                "php",
+                "read",
+                "scale",
+                "spreadsheet",
+                "stream",
+                "write",
+                "xlsx"
+            ],
+            "time": "2015-05-13 04:13:03"
+        },
         {
             "name": "classpreloader/classpreloader",
             "version": "1.3.0",
@@ -769,16 +885,16 @@
         },
         {
             "name": "maatwebsite/excel",
-            "version": "2.0.x-dev",
+            "version": "v2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Maatwebsite/Laravel-Excel.git",
-                "reference": "224fdd1c9f0ade7a0cadbfbfcdf68c19ab3638f7"
+                "reference": "0ade0c2b0795d185bcf598ef41f55283a30dbd79"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Maatwebsite/Laravel-Excel/zipball/224fdd1c9f0ade7a0cadbfbfcdf68c19ab3638f7",
-                "reference": "224fdd1c9f0ade7a0cadbfbfcdf68c19ab3638f7",
+                "url": "https://api.github.com/repos/Maatwebsite/Laravel-Excel/zipball/0ade0c2b0795d185bcf598ef41f55283a30dbd79",
+                "reference": "0ade0c2b0795d185bcf598ef41f55283a30dbd79",
                 "shasum": ""
             },
             "require": {
@@ -832,7 +948,7 @@
                 "import",
                 "laravel"
             ],
-            "time": "2015-05-02 19:01:34"
+            "time": "2015-05-02 19:02:05"
         },
         {
             "name": "monolog/monolog",
@@ -1724,6 +1840,61 @@
             "description": "Symfony HttpKernel Component",
             "homepage": "https://symfony.com",
             "time": "2015-05-11 01:58:49"
+        },
+        {
+            "name": "symfony/options-resolver",
+            "version": "v2.6.7",
+            "target-dir": "Symfony/Component/OptionsResolver",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/OptionsResolver.git",
+                "reference": "ac469b57f9bb4fef66ecf48113476d13ce0bdea4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/OptionsResolver/zipball/ac469b57f9bb4fef66ecf48113476d13ce0bdea4",
+                "reference": "ac469b57f9bb4fef66ecf48113476d13ce0bdea4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "symfony/phpunit-bridge": "~2.7"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.6-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\OptionsResolver\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony OptionsResolver Component",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "config",
+                "configuration",
+                "options"
+            ],
+            "time": "2015-05-02 15:18:45"
         },
         {
             "name": "symfony/process",
@@ -3199,9 +3370,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "maatwebsite/excel": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

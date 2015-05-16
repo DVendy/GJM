@@ -9,10 +9,10 @@ class News extends Model {
 	 *
 	 * @var string
 	 */
-	protected $table = 'products';
+	protected $table = 'news';
 
 	/*
 		News Properties belongs here.....
 	*/
-
+	protected $fillable = ['title', 'body', 'date'];
 }
