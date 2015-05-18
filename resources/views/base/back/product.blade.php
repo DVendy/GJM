@@ -1,7 +1,7 @@
 @extends('base.back.base')
 
 @section('extraStyle')
-	<title>GJM - Products</title>
+	<title>GJM - Product</title>
 @stop
 
 @section('headerExtraScript')
@@ -24,10 +24,12 @@ Product list
 	</ul>
 </div>
 <ul class="info-blocks" style="text-align: left;">
+	@if(Auth::user()->role == "admin")
 	<li class="bg-primary">
 		<div class="top-info"><a data-toggle="modal" role="button" href="#iconified_modal">Import Data</a><small>import excel data</small></div>
 		<a data-toggle="modal" role="button" href="#iconified_modal"><i class="icon-download2"></i></a><span class="bottom-info bg-danger"></span>
 	</li>
+	@endif
 	<li class="bg-info">
 		<div class="top-info"><a data-toggle="modal" role="button" href="{{ URL('export') }}">Export Data</a><small>export excel data</small></div>
 		<a data-toggle="modal" role="button" href="{{ URL('export') }}"><i class="icon-upload2"></i></a><span class="bottom-info bg-success"></span>

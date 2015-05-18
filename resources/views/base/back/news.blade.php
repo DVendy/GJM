@@ -41,22 +41,26 @@ News list
 		<li class="active">News</li>
 	</ul>
 </div>
+@if(Auth::user()->role == "admin")
 <ul class="info-blocks" style="text-align: left;">
 	<li class="bg-primary">
 		<div class="top-info"><a data-toggle="modal" role="button" href="#iconified_modal">New News</a><small>create new news</small></div>
 		<a data-toggle="modal" role="button" href="#iconified_modal"><i class="icon-pencil"></i></a><span class="bottom-info bg-danger"></span>
 	</li>
 </ul>
+@endif
 
 @foreach($news as $key)
 <div class="panel panel-default">
 	<div class="panel-heading">
 		<h6 class="panel-title"><i class="icon-bubble4"></i> {{ $key->title }}<small> {{ $key->date }}</small></h6>
+		@if(Auth::user()->role == "admin")
 		<h6 class="panel-title pull-right">
 			<a href="#" data-toggle="modal" data-target="#edit_modal" title="Delete"><i class="icon-pencil text-success edit_news" id="{{ $key->id }}"></i></a>
 			&nbsp;
 			<a href="#" data-toggle="modal" data-target="#delete_modal" title="Delete"><i class="icon-close text-danger delete_news" id="{{ $key->id }}"></i></a>		
 		</h6>
+		@endif
 	</div>
 	<div class="panel-body" style="max-height: 300px;overflow-y: scroll;">
 		{!! $key->body !!}
@@ -127,8 +131,8 @@ News list
 				delete?
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-warning" data-dismiss="modal">Close</button>
-				<a href="#" class="btn btn-primary" id="delete_news">Save</a>
+				<button class="btn btn-warning" data-dismiss="modal"><i class="icon-cancel-circle"></i> Cancel</button>
+				<a href="#" class="btn btn-primary" id="delete_news"><i class="icon-remove3"></i> Delete</a>
 			</div>
 		</div>
 	</div>

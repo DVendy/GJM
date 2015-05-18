@@ -32,6 +32,7 @@ class AuthenticateAdmin {
 	 */
 	public function handle($request, Closure $next)
 	{
+		//die($this->auth->user()->role);
 		if ($this->auth->guest())
 		{
 			if ($request->ajax())
@@ -44,7 +45,7 @@ class AuthenticateAdmin {
 			}
 		}
 
-		if($this->auth->user()->role!='admin')
+		if($this->auth->user()->role!='admin' && $this->auth->user()->role!='marketing')
 			return redirect()->guest('login');
 
 		return $next($request);

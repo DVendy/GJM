@@ -7,9 +7,11 @@ use Input;
 use App\Product;
 use App\Upload;
 use App\News;
+use App\User;
 use Eloquent;
 use DB;
 use Session;
+use Hash;
 
 use Akeneo\Component\SpreadsheetParser\SpreadsheetParser;
 
@@ -34,6 +36,7 @@ class BackController extends Controller {
 	public function __construct()
 	{
 		$this->middleware('admin');
+		$this->middleware('marketing');
 	}
 
 	/**
@@ -53,7 +56,43 @@ class BackController extends Controller {
 	 */
 	public function user()
 	{
-		return Theme::back('user');
+		$users = User::all();
+		return Theme::back('user')->with('users', $users);
+	}
+
+	public function user_create()
+	{
+		$user = new User();
+		$user->username = Input::get('username');
+		$user->name = Input::get('name');
+		$user->password = Hash::make(Input::get('password'));
+		$user->hp = Input::get('phone');
+		$user->email = Input::get('email');
+		$user->role = Input::get('roles');
+		$user->save();
+		return redirect('user');
+	}
+
+	public function user_update()
+	{
+		//die(Input::get('id'));
+		$user = User::find(Input::get('id'));
+		$user->name = Input::get('edit_name');
+		$user->password = Hash::make(Input::get('edit_password'));
+		$user->hp = Input::get('edit_phone');
+		$user->email = Input::get('edit_email');
+		$user->role = Input::get('edit_roles');
+		$user->save();
+		return redirect('user');
+	}
+
+	public function user_delete($id)
+	{
+		//die(Input::get('news'));
+		$user = User::find($id);
+		$user->delete();
+
+		return redirect('user');
 	}
 
 	/**
@@ -132,7 +171,8 @@ class BackController extends Controller {
 		if (file_exists(storage_path('temp')))
             $this->rrmdir(storage_path('temp'));
 
-		return Theme::back('product')->with('products', $products)->with('pagination', $pagination);
+        //die(var_dump(Input::all()));
+		return Theme::back('product')->with('products', $products)->with('pagination', $pagination)->with('terms', Input::all());
 	}
 
 	function rrmdir($dir) { 

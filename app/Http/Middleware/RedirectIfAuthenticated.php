@@ -35,7 +35,7 @@ class RedirectIfAuthenticated {
 	{
 		if ($this->auth->check())
 		{
-			if($this->auth->user()->role=='admin')
+			if($this->auth->user()->role=='admin' || $this->auth->user()->role=='marketing')
 				return new RedirectResponse(action('BackController@index'));
 			else
 				return new RedirectResponse(action('AuthController@showLogin'));
