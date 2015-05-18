@@ -128,8 +128,25 @@ class BackController extends Controller {
 		Session::put('progress', 0);
 		Session::save();
 
+		//$this->rrmdir(storage_path('temp'));
+		if (file_exists(storage_path('temp')))
+            $this->rrmdir(storage_path('temp'));
+
 		return Theme::back('product')->with('products', $products)->with('pagination', $pagination);
 	}
+
+	function rrmdir($dir) { 
+	   if (is_dir($dir)) { 
+	     $objects = scandir($dir); 
+	     foreach ($objects as $object) { 
+	       if ($object != "." && $object != "..") { 
+	         if (filetype($dir."/".$object) == "dir") $this->rrmdir($dir."/".$object); else unlink($dir."/".$object); 
+	       } 
+	     } 
+	     reset($objects); 
+	     rmdir($dir); 
+	   } 
+	 }
 
 	public function import_new()
 	{
@@ -147,7 +164,7 @@ class BackController extends Controller {
 		$fileName = $now.'.'.$extension;
 		Input::file('file')->move(storage_path('excel/exports'), $fileName);
 		//echo("2. " . memory_get_usage()/1000000 . " MB <br>");
-
+		//unlink(storage_path('excel/exports/'). $fileName);
 		Session::put('progress', "Processing...");
 		Session::save();
 		set_time_limit(0);
@@ -191,10 +208,9 @@ class BackController extends Controller {
 		$upload->date = $date_now;
 		$upload->save();
 
-
 		$time2 = microtime(true);
 		echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
-		die("memory sekarang " . memory_get_usage()/1000000 . " MB <br>");
+		//die("memory sekarang " . memory_get_usage()/1000000 . " MB <br>");
 		return redirect('product');
 	}
 

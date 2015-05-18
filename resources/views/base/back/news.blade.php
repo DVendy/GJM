@@ -15,12 +15,12 @@ tinymce.init({
     skin: 'light',
     menubar : false,
     plugins: [
-        "advlist autolink lists link image charmap preview anchor",
+        "advlist autolink lists charmap preview anchor",
         "searchreplace visualblocks code fullscreen",
         "insertdatetime media table contextmenu paste"
     ],
 
-    toolbar: "undo redo | styleselect | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | code preview"
+    toolbar: "undo redo | styleselect | bold italic underline strikethrough | bullist numlist | preview"
  });
 </script>
 
