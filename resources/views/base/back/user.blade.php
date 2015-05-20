@@ -86,38 +86,43 @@ User list
 			<input type="hidden" name="_token" value="{{ csrf_token() }}">
 			<div class="modal-body">
 				<div class="panel-body">
-					<div class="form-group">
+					<div class="form-group @if ($errors->has('username')) has-error @endif">
 						<label class="col-sm-2 control-label">Username: </label>
 						<div class="col-sm-10">
-							<input type="text" class="form-control" name="username">
+							<input type="text" class="form-control" name="username" value="{{ Input::old('username') }}">
+							@if ($errors->has('username')) <p class="help-block">{{ $errors->first('username') }}</p> @endif
 						</div>
 					</div>
 					&nbsp;
-					<div class="form-group">
+					<div class="form-group @if ($errors->has('password')) has-error @endif">
 						<label class="col-sm-2 control-label">Password: </label>
 						<div class="col-sm-10">
 							<input type="password" class="form-control" name="password">
+							@if ($errors->has('username')) <p class="help-block">{{ $errors->first('password') }}</p> @endif
 						</div>
 					</div>
 					&nbsp;
-					<div class="form-group">
+					<div class="form-group @if ($errors->has('name')) has-error @endif">
 						<label class="col-sm-2 control-label">Name: </label>
 						<div class="col-sm-10">
-							<input type="text" class="form-control" name="name">
+							<input type="text" class="form-control" name="name" value="{{ Input::old('name') }}">
+							@if ($errors->has('username')) <p class="help-block">{{ $errors->first('name') }}</p> @endif
 						</div>
 					</div>
 					&nbsp;
-					<div class="form-group">
+					<div class="form-group @if ($errors->has('phone')) has-error @endif">
 						<label class="col-sm-2 control-label">Phone: </label>
 						<div class="col-sm-10">
-							<input type="text" class="form-control" name="phone">
+							<input type="text" class="form-control" name="phone" value="{{ Input::old('phone') }}">
+							@if ($errors->has('username')) <p class="help-block">{{ $errors->first('phone') }}</p> @endif
 						</div>
 					</div>
 					&nbsp;
-					<div class="form-group">
+					<div class="form-group @if ($errors->has('email')) has-error @endif">
 						<label class="col-sm-2 control-label">Email: </label>
 						<div class="col-sm-10">
-							<input type="text" class="form-control" name="email">
+							<input type="text" class="form-control" name="email" value="{{ Input::old('email') }}">
+							@if ($errors->has('username')) <p class="help-block">{{ $errors->first('email') }}</p> @endif
 						</div>
 					</div>
 					&nbsp;
@@ -136,7 +141,7 @@ User list
 			</div>
 			<div class="modal-footer">
 				<button class="btn btn-warning" data-dismiss="modal"><i class="icon-cancel-circle"></i> Cancel</button>
-				<button class="btn btn-primary" type="submit" value="Import" id="form-overview"><i class="icon-download2"></i> Import</button>
+				<button class="btn btn-primary" type="submit" value="Import" id="form-overview"><i class="icon-download2"></i> Create</button>
 			</div>
 			</form>
 		</div>
@@ -152,41 +157,46 @@ User list
 			</div>
 			<form action="{{URL::to('user_update')}}" method="post">
 			<input type="hidden" name="_token" value="{{ csrf_token() }}">
-			<input type="hidden" name="id" value="1" id="edit_id">
+			<input type="hidden" name="edit_id" value="1" id="edit_id" value="{{ Input::old('edit_id') }}">
 			<div class="modal-body">
 				<div class="panel-body">
-					<div class="form-group">
+					<div class="form-group @if ($errors->has('edit_username')) has-error @endif">
 						<label class="col-sm-2 control-label">Username: </label>
 						<div class="col-sm-10">
-							<input type="text" class="form-control" disabled="disabled" name="edit_username" id="edit_username">
+							<input type="text" class="form-control" readonly name="edit_username" id="edit_username" value="{{ Input::old('edit_username') }}">
+							@if ($errors->has('edit_username')) <p class="help-block">{{ $errors->first('edit_username') }}</p> @endif
 						</div>
 					</div>
 					&nbsp;
-					<div class="form-group">
+					<div class="form-group @if ($errors->has('edit_password')) has-error @endif">
 						<label class="col-sm-2 control-label">Password: </label>
 						<div class="col-sm-10">
-							<input type="password" class="form-control" name="edit_password" id="edit_password">
+							<input type="password" class="form-control" name="edit_password" id="edit_password" value="{{ Input::old('edit_password') }}">
+							@if ($errors->has('edit_password')) <p class="help-block">{{ $errors->first('edit_password') }}</p> @endif
 						</div>
 					</div>
 					&nbsp;
-					<div class="form-group">
+					<div class="form-group @if ($errors->has('edit_name')) has-error @endif">
 						<label class="col-sm-2 control-label">Name: </label>
 						<div class="col-sm-10">
-							<input type="text" class="form-control" name="edit_name" id="edit_name">
+							<input type="text" class="form-control" name="edit_name" id="edit_name" value="{{ Input::old('edit_name') }}">
+							@if ($errors->has('edit_name')) <p class="help-block">{{ $errors->first('edit_name') }}</p> @endif
 						</div>
 					</div>
 					&nbsp;
-					<div class="form-group">
+					<div class="form-group @if ($errors->has('edit_phone')) has-error @endif">
 						<label class="col-sm-2 control-label">Phone: </label>
 						<div class="col-sm-10">
-							<input type="text" class="form-control" name="edit_phone" id="edit_phone">
+							<input type="text" class="form-control" name="edit_phone" id="edit_phone" value="{{ Input::old('edit_phone') }}">
+							@if ($errors->has('edit_phone')) <p class="help-block">{{ $errors->first('edit_phone') }}</p> @endif
 						</div>
 					</div>
 					&nbsp;
-					<div class="form-group">
+					<div class="form-group @if ($errors->has('edit_email')) has-error @endif">
 						<label class="col-sm-2 control-label">Email: </label>
 						<div class="col-sm-10">
-							<input type="text" class="form-control" name="edit_email" id="edit_email">
+							<input type="text" class="form-control" name="edit_email" id="edit_email" value="{{ Input::old('edit_email') }}">
+							@if ($errors->has('edit_email')) <p class="help-block">{{ $errors->first('edit_email') }}</p> @endif
 						</div>
 					</div>
 					&nbsp;
@@ -234,6 +244,16 @@ User list
 
 @section('footerExtraScript')
 <script type="text/javascript">
+	@if($errors->has('create'))
+	$(window).load(function(){
+        $('#iconified_modal').modal('show');
+    });
+	@endif
+	@if($errors->has('update'))
+	$(window).load(function(){
+        $('#edit_modal').modal('show');
+    });
+	@endif
 	$(document).ready(function() {
 		$(".delete_user").click(function(event){
 			$("#delete_user").prop('href', 'user/delete-' + event.target.id);

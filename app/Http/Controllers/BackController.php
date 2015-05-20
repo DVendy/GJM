@@ -12,6 +12,7 @@ use Eloquent;
 use DB;
 use Session;
 use Hash;
+use Validator;
 
 use Akeneo\Component\SpreadsheetParser\SpreadsheetParser;
 
@@ -62,28 +63,72 @@ class BackController extends Controller {
 
 	public function user_create()
 	{
-		$user = new User();
-		$user->username = Input::get('username');
-		$user->name = Input::get('name');
-		$user->password = Hash::make(Input::get('password'));
-		$user->hp = Input::get('phone');
-		$user->email = Input::get('email');
-		$user->role = Input::get('roles');
-		$user->save();
-		return redirect('user');
+		$validate = Validator::make(Input::all(), array(
+			'username' 	=> 'required||unique:users',
+			'name' 	=> 'required||min:3',
+			'password' 		=> 'required||min:5',
+			'phone'=> 'required||min:3',
+			'email'	=> 'required||min:3',
+			'roles'	=> 'required',
+			));
+
+		if ($validate -> fails()){
+			$validate = Validator::make(Input::all(), array(
+			'username' 	=> 'required||unique:users',
+			'name' 	=> 'required||min:3',
+			'password' 		=> 'required||min:5',
+			'phone'=> 'required||min:3',
+			'email'	=> 'required||min:3',
+			'roles'	=> 'required',
+			'create' => 'required',
+			));
+			return redirect('user')->withErrors($validate)->withInput();
+		}
+		else{		
+	    //
+			$user = new User();
+			$user->username = Input::get('username');
+			$user->name = Input::get('name');
+			$user->password = Hash::make(Input::get('password'));
+			$user->hp = Input::get('phone');
+			$user->email = Input::get('email');
+			$user->role = Input::get('roles');
+			$user->save();
+			return redirect('user');
+		}
 	}
 
 	public function user_update()
 	{
-		//die(Input::get('id'));
-		$user = User::find(Input::get('id'));
-		$user->name = Input::get('edit_name');
-		$user->password = Hash::make(Input::get('edit_password'));
-		$user->hp = Input::get('edit_phone');
-		$user->email = Input::get('edit_email');
-		$user->role = Input::get('edit_roles');
-		$user->save();
-		return redirect('user');
+		$validate = Validator::make(Input::all(), array(
+			'edit_name' 	=> 'required||min:3',
+			'edit_password' 		=> 'required||min:5',
+			'edit_phone'=> 'required||min:3',
+			'edit_email'	=> 'required||min:3',
+			'edit_roles'	=> 'required',
+			));
+
+		if ($validate -> fails()){
+			$validate = Validator::make(Input::all(), array(
+			'edit_name' 	=> 'required||min:3',
+			'edit_password' 		=> 'required||min:5',
+			'edit_phone'=> 'required||min:3',
+			'edit_email'	=> 'required||min:3',
+			'edit_roles'	=> 'required',
+			'update' => 'required',
+			));
+			return redirect('user')->withErrors($validate)->withInput();
+		}
+		else{	
+			$user = User::find(Input::get('edit_id'));
+			$user->name = Input::get('edit_name');
+			$user->password = Hash::make(Input::get('edit_password'));
+			$user->hp = Input::get('edit_phone');
+			$user->email = Input::get('edit_email');
+			$user->role = Input::get('edit_roles');
+			$user->save();
+			return redirect('user');
+		}
 	}
 
 	public function user_delete($id)
@@ -169,24 +214,24 @@ class BackController extends Controller {
 
 		//$this->rrmdir(storage_path('temp'));
 		if (file_exists(storage_path('temp')))
-            $this->rrmdir(storage_path('temp'));
+			$this->rrmdir(storage_path('temp'));
 
         //die(var_dump(Input::all()));
 		return Theme::back('product')->with('products', $products)->with('pagination', $pagination)->with('terms', Input::all());
 	}
 
 	function rrmdir($dir) { 
-	   if (is_dir($dir)) { 
-	     $objects = scandir($dir); 
-	     foreach ($objects as $object) { 
-	       if ($object != "." && $object != "..") { 
-	         if (filetype($dir."/".$object) == "dir") $this->rrmdir($dir."/".$object); else unlink($dir."/".$object); 
-	       } 
-	     } 
-	     reset($objects); 
-	     rmdir($dir); 
-	   } 
-	 }
+		if (is_dir($dir)) { 
+			$objects = scandir($dir); 
+			foreach ($objects as $object) { 
+				if ($object != "." && $object != "..") { 
+					if (filetype($dir."/".$object) == "dir") $this->rrmdir($dir."/".$object); else unlink($dir."/".$object); 
+				} 
+			} 
+			reset($objects); 
+			rmdir($dir); 
+		} 
+	}
 
 	public function import_new()
 	{
@@ -219,7 +264,7 @@ class BackController extends Controller {
 		$users = [];
 		$i = 0;
 		foreach ($workbook->createRowIterator($myWorksheetIndex) as $rowIndex => $values) {
-		    if ($values[0] != "" && $values[0] != "ItemCode"){
+			if ($values[0] != "" && $values[0] != "ItemCode"){
 				$users[] = [
 				'itemcode' => $values[0],
 				'description' => $values[1],

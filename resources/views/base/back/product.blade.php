@@ -136,18 +136,18 @@ Product list
 				</ul>
 				<hr>
 				<form action="{{URL::to('import')}}" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="_token" value="{{{ csrf_token() }}}">
 					<div class="form-group">
 						<label>File</label>
 						<input name="file" id="file" type="file" class="file btn-success" accept=".xlsx; .xls"></input>
 					</div>
-					<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
 				</div>
 				<div class="modal-footer">
 					<button class="btn btn-warning" data-dismiss="modal"><i class="icon-cancel-circle"></i> Cancel</button>
 					<button class="btn btn-primary" type="submit" value="Import" id="form-overview"><i class="icon-download2"></i> Import</button>
 				</form>
-				<div id="progress">asd</div>
+				<div id="progress"></div>
 			</div>
 		</div>
 	</div>
