@@ -1,0 +1,3 @@
+apache : rewrite module
+php : max upload & post
+www/index.php : suppress localhost
