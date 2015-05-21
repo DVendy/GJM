@@ -8,6 +8,8 @@ use Theme;
 
 //Request handler
 use App\Http\Requests\LoginRequest;
+use Carbon\Carbon;
+use App\Login_H;
 
 class AuthController extends Controller {
 
@@ -41,6 +43,10 @@ class AuthController extends Controller {
 
         if (Auth::attempt(['username' => $request->input('username'), 'password' => $request->input('password')], $remember))
         {
+        	$login_h = new Login_H();
+        	$login_h->date = Carbon::now();
+        	$login_h->users_id = Auth::user()->id;
+        	$login_h->save();
             return redirect(action('BackController@index'));
         }
 

@@ -140,7 +140,6 @@ return [
 		'App\Kreasys\Service\ThemeServiceProvider',
 		'App\Kreasys\Service\HelperServiceProvider',
 		'Intervention\Image\ImageServiceProvider',
-		'Maatwebsite\Excel\ExcelServiceProvider',
 
 		/*
 		 * Application Service Providers...
@@ -204,7 +203,6 @@ return [
 		'Theme'		=> 'App\Kreasys\Provider\Theme',
 		'Helper'	=> 'App\Kreasys\Provider\Helper',
 		'Image' 	=> 'Intervention\Image\Facades\Image',
-		'Excel' => 'Maatwebsite\Excel\Facades\Excel',
 	],
 
 ];

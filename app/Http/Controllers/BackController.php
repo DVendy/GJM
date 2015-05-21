@@ -1,6 +1,5 @@
 <?php namespace App\Http\Controllers;
 
-use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use Theme;
 use Input;
@@ -8,6 +7,7 @@ use App\Product;
 use App\Upload;
 use App\News;
 use App\User;
+use App\Login_H;
 use Eloquent;
 use DB;
 use Session;
@@ -48,6 +48,7 @@ class BackController extends Controller {
 	 */
 	public function index()
 	{
+
 		return Theme::back('index');
 	}
 
@@ -279,7 +280,7 @@ class BackController extends Controller {
 		Session::put('progress', "Uploading...");
 		Session::save();
 
-		$date_now = Carbon::now()->addHours(7);
+		$date_now = Carbon::now();
 		$now = $date_now->toDateTimeString();
 		$now = str_replace(" ","_", $now);
 		$now = str_replace(":","-", $now);

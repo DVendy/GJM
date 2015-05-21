@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateLoginCount extends Migration {
+class CreateLoginCount2 extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,12 +12,9 @@ class CreateLoginCount extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('login_history', function(Blueprint $table)
+		Schema::table('login_history', function($table)
 		{
-			$table->increments('id');
-			$table->datetime('date');
-			$table->integer('users_id');
-			$table->timestamps();
+		    $table->renameColumn('users_id', 'users_id');
 		});
 	}
 

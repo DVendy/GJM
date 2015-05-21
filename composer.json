@@ -9,9 +9,8 @@
 		"illuminate/html": "5.*",
 		"intervention/image": "2.*",
 		"fzaninotto/faker": "v1.4.0",
-		"maatwebsite/excel": "~2.0.0",
-		"box/spout": "*",
-		"akeneo/spreadsheet-parser": "*"
+		"akeneo/spreadsheet-parser": "*",
+		"doctrine/dbal": "*"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "~4.0",
