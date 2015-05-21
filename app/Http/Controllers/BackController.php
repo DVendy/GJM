@@ -13,6 +13,7 @@ use DB;
 use Session;
 use Hash;
 use Validator;
+use Auth;
 
 use Akeneo\Component\SpreadsheetParser\SpreadsheetParser;
 
@@ -67,6 +68,7 @@ class BackController extends Controller {
 			'username' 	=> 'required||unique:users',
 			'name' 	=> 'required||min:3',
 			'password' 		=> 'required||min:5',
+			'password2' => 'same:password',
 			'phone'=> 'required||min:3',
 			'email'	=> 'required||min:3',
 			'roles'	=> 'required',
@@ -74,14 +76,15 @@ class BackController extends Controller {
 
 		if ($validate -> fails()){
 			$validate = Validator::make(Input::all(), array(
-			'username' 	=> 'required||unique:users',
-			'name' 	=> 'required||min:3',
-			'password' 		=> 'required||min:5',
-			'phone'=> 'required||min:3',
-			'email'	=> 'required||min:3',
-			'roles'	=> 'required',
-			'create' => 'required',
-			));
+				'username' 	=> 'required||unique:users',
+				'name' 	=> 'required||min:3',
+				'password' 		=> 'required||min:5',
+				'password2' => 'same:password',
+				'phone'=> 'required||min:3',
+				'email'	=> 'required||min:3',
+				'roles'	=> 'required',
+				'create' => 'required',
+				));
 			return redirect('user')->withErrors($validate)->withInput();
 		}
 		else{		
@@ -110,13 +113,13 @@ class BackController extends Controller {
 
 		if ($validate -> fails()){
 			$validate = Validator::make(Input::all(), array(
-			'edit_name' 	=> 'required||min:3',
-			'edit_password' 		=> 'required||min:5',
-			'edit_phone'=> 'required||min:3',
-			'edit_email'	=> 'required||min:3',
-			'edit_roles'	=> 'required',
-			'update' => 'required',
-			));
+				'edit_name' 	=> 'required||min:3',
+				'edit_password' 		=> 'required||min:5',
+				'edit_phone'=> 'required||min:3',
+				'edit_email'	=> 'required||min:3',
+				'edit_roles'	=> 'required',
+				'update' => 'required',
+				));
 			return redirect('user')->withErrors($validate)->withInput();
 		}
 		else{	
@@ -128,6 +131,42 @@ class BackController extends Controller {
 			$user->role = Input::get('edit_roles');
 			$user->save();
 			return redirect('user');
+		}
+	}
+
+	public function user_edit(){
+		$user = User::find(Auth::user()->id);
+		$validate = Validator::make(Input::all(), array(
+			'name' 	=> 'required||min:3',
+			'old_password' 		=> 'required',
+			'password' 		=> 'required||min:5',
+			'password2' => 'same:password',
+			'phone'=> 'required||min:3',
+			'email'	=> 'required||min:3',
+			));
+
+		if ($validate -> fails()){
+			if (!Hash::check(Input::get('old_password'), $user->password)) {
+				$validate = Validator::make(Input::all(), array(
+					'name' 	=> 'required||min:3',
+					'old_password' 		=> 'required',
+					'password' 		=> 'required||min:5',
+					'password2' => 'same:password',
+					'phone'=> 'required||min:3',
+					'email'	=> 'required||min:3',
+					'wrong' => 'required',
+				));
+			}
+			return redirect('editprofile')->withErrors($validate)->withInput();
+		}
+		else{
+			$user->name = Input::get('name');
+			$user->password = Hash::make(Input::get('password'));
+			$user->hp = Input::get('phone');
+			$user->email = Input::get('email');
+			$user->save();
+			$asd = "true";
+			return Theme::back('user_edit')->with('asd', $asd);
 		}
 	}
 

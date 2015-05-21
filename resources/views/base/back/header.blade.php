@@ -17,19 +17,22 @@
         <!-- User dropdown -->
         <div class="user-menu dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <div class="user-info">{{ Auth::user()->name }} <span>{{ Auth::user()->name }}</span></div>
+                <div class="user-info">{{ Auth::user()->name }} <span>{{ Auth::user()->role }}</span></div>
             </a>
             <div class="popup dropdown-menu dropdown-menu-right">
-                <div class="thumbnail">
-                    <div class="thumb">
-                        <div class="thumb-options"><span><a href="#" class="btn btn-icon btn-success"><i class="icon-pencil"></i></a></span></div>
-                    </div>
+                <div class="thumbnail" style="padding-bottom: 0px;">
                     <div class="caption text-center">
-                        <h6>{{ Auth::user()->name }} <small>{{ Auth::user()->name }}</small></h6>
+                        <h6 style="text-transform: capitalize;">{{ Auth::user()->name }} <small>{{ Auth::user()->role }} - <span style="text-transform: none;">{{ Auth::user()->email }}</span></small></h6>
                     </div>
+                    <hr style="margin-bottom: 0;">
                 </div>
-                <div class="user-logout" style="padding:10px; text-align:center;">
-                    <a href="{{ action('AuthController@doLogout') }}" class="btn btn-danger"><i class="icon-lock"></i> Logout</a>
+                <div class="row">
+                    <div class="user-logout col-md-6" style="padding:10px; padding-left: 22px;">
+                        <a href="{{ action('AuthController@editProfile') }}" class="btn btn-success"><i class="icon-pencil3"></i> Update</a>
+                    </div>
+                    <div class="user-logout col-md-6" style="padding:10px;">
+                        <a href="{{ action('AuthController@doLogout') }}" class="btn btn-danger"><i class="icon-lock"></i> Logout</a>
+                    </div>
                 </div>
             </div>
         </div> 

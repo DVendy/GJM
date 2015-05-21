@@ -56,4 +56,8 @@ class AuthController extends Controller {
         return redirect(action('AuthController@showLogin'))->withMessages('Logged out..');
 	}
 
+	public function editProfile(){
+		return Theme::back('user_edit');
+	}
+
 }

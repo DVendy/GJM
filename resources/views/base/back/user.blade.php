@@ -98,7 +98,15 @@ User list
 						<label class="col-sm-2 control-label">Password: </label>
 						<div class="col-sm-10">
 							<input type="password" class="form-control" name="password">
-							@if ($errors->has('username')) <p class="help-block">{{ $errors->first('password') }}</p> @endif
+							@if ($errors->has('password')) <p class="help-block">{{ $errors->first('password') }}</p> @endif
+						</div>
+					</div>
+					&nbsp;
+					<div class="form-group @if ($errors->has('password2')) has-error @endif">
+						<label class="col-sm-2 control-label">Retype password: </label>
+						<div class="col-sm-10">
+							<input type="password" class="form-control" name="password2">
+							@if ($errors->has('password2')) <p class="help-block">{{ $errors->first('password2') }}</p> @endif
 						</div>
 					</div>
 					&nbsp;
@@ -106,7 +114,7 @@ User list
 						<label class="col-sm-2 control-label">Name: </label>
 						<div class="col-sm-10">
 							<input type="text" class="form-control" name="name" value="{{ Input::old('name') }}">
-							@if ($errors->has('username')) <p class="help-block">{{ $errors->first('name') }}</p> @endif
+							@if ($errors->has('name')) <p class="help-block">{{ $errors->first('name') }}</p> @endif
 						</div>
 					</div>
 					&nbsp;
@@ -114,7 +122,7 @@ User list
 						<label class="col-sm-2 control-label">Phone: </label>
 						<div class="col-sm-10">
 							<input type="text" class="form-control" name="phone" value="{{ Input::old('phone') }}">
-							@if ($errors->has('username')) <p class="help-block">{{ $errors->first('phone') }}</p> @endif
+							@if ($errors->has('phone')) <p class="help-block">{{ $errors->first('phone') }}</p> @endif
 						</div>
 					</div>
 					&nbsp;
@@ -122,7 +130,7 @@ User list
 						<label class="col-sm-2 control-label">Email: </label>
 						<div class="col-sm-10">
 							<input type="text" class="form-control" name="email" value="{{ Input::old('email') }}">
-							@if ($errors->has('username')) <p class="help-block">{{ $errors->first('email') }}</p> @endif
+							@if ($errors->has('email')) <p class="help-block">{{ $errors->first('email') }}</p> @endif
 						</div>
 					</div>
 					&nbsp;
@@ -169,7 +177,7 @@ User list
 					</div>
 					&nbsp;
 					<div class="form-group @if ($errors->has('edit_password')) has-error @endif">
-						<label class="col-sm-2 control-label">Password: </label>
+						<label class="col-sm-2 control-label">New password: </label>
 						<div class="col-sm-10">
 							<input type="password" class="form-control" name="edit_password" id="edit_password" value="{{ Input::old('edit_password') }}">
 							@if ($errors->has('edit_password')) <p class="help-block">{{ $errors->first('edit_password') }}</p> @endif
@@ -265,10 +273,6 @@ User list
 			});
 			$.get('user/' + event.target.id + '/username', function( data ) {
 				var elem = document.getElementById("edit_username");
-				elem.value = data;
-			});
-			$.get('user/' + event.target.id + '/password', function( data ) {
-				var elem = document.getElementById("edit_password");
 				elem.value = data;
 			});
 			$.get('user/' + event.target.id + '/name', function( data ) {

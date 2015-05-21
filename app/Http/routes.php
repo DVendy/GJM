@@ -50,6 +50,7 @@ Route::get('news/delete-{id}', 'BackController@news_delete');
 Route::get('user', 'BackController@user');
 Route::post('user_create', 'BackController@user_create');
 Route::post('user_update', 'BackController@user_update');
+Route::post('user_edit', 'BackController@user_edit');
 Route::get('/user/{id}/id', function($id)
 {
     return User::find($id)->id;
@@ -80,6 +81,7 @@ Route::get('user/delete-{id}', 'BackController@user_delete');
 Route::get('login', 'AuthController@showLogin');
 Route::post('login', 'AuthController@doLogin');
 Route::get('logout', 'AuthController@doLogout');
+Route::get('editprofile', 'AuthController@editProfile');
 
 
 //--- API
