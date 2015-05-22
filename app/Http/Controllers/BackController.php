@@ -281,6 +281,10 @@ class BackController extends Controller {
 		} 
 	}
 
+	public function import_spout(){		
+		
+	}
+
 	public function import_new()
 	{
 		//echo("1. " . memory_get_usage()/1000000 . " MB <br>");

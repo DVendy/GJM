@@ -10,7 +10,8 @@
 		"intervention/image": "2.*",
 		"fzaninotto/faker": "v1.4.0",
 		"akeneo/spreadsheet-parser": "*",
-		"doctrine/dbal": "*"
+		"doctrine/dbal": "*",
+		"box/spout": "1.0.7"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "~4.0",
