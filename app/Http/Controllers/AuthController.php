@@ -45,7 +45,7 @@ class AuthController extends Controller {
         {
         	$login_h = new Login_H();
         	$login_h->date = Carbon::now();
-        	$login_h->users_id = Auth::user()->id;
+        	$login_h->user_id = Auth::user()->id;
         	$login_h->save();
             return redirect(action('BackController@index'));
         }

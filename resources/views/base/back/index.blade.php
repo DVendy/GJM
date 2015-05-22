@@ -15,6 +15,44 @@
 		<li class="active">Dashboard</li>
 	</ul>
 </div>
+<div class="row">
+	<div class="col-md-6">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h6 class="panel-title"><i class="icon-user4"></i> Top 10 Marketing</h6>
+			</div>
+			<div class="datatable">
+				<table class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Name</th>
+							<th>Login count</th>
+						</tr>
+					</thead>
+					<tbody>
+					<?php
+						$ii = 1;
+					?>
+						@foreach($top as $i => $key)
+						<tr>
+							<td>{{ $ii }}</td>
+							<td>{{ $i }}</td>
+							<td>{{ $key }}</td>
+						</tr>
+						<?php
+							$ii++;
+						?>
+						@endforeach
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-6">
+		
+	</div>
+</div>
 @stop
 
 @section('footerExtraScript')

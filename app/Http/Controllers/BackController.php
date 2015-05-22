@@ -48,8 +48,16 @@ class BackController extends Controller {
 	 */
 	public function index()
 	{
-
-		return Theme::back('index');
+		$users = User::all();
+		
+		foreach ($users as $key => $value) {
+			if ($value->role != "admin" && $value->login_h->count() != 0)
+				$top[$value->name] = $value->login_h->count();
+		}
+		arsort($top);
+		//var_dump($top);
+		//die();
+		return Theme::back('index')->with('top', $top);
 	}
 
 	/**
@@ -61,7 +69,7 @@ class BackController extends Controller {
 	{
 		$users = User::all();
 		return Theme::back('user')->with('users', $users);
-	}
+	} 
 
 	public function user_create()
 	{
