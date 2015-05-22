@@ -285,6 +285,32 @@ class BackController extends Controller {
 		
 	}
 
+	function isSame($p, $v){
+		if ($p->description != $v[1]){
+				//echo $p->description;
+					return false;}
+		if ($p->itemname != $v[2]){
+				//echo $p->itemname;
+					return false;}
+		if ($p->model != $v[3]){
+				//echo $p->model;
+					return false;}
+		if ($p->spec != $v[4]){
+				//echo $p->spec;
+					return false;}
+		if ($p->registrasi != $v[5]){
+				//echo $p->registrasi;
+					return false;}
+		if ($p->kurs != $v[6]){
+				//echo $p->kurs;
+					return false;}
+		if ($p->price != $v[7]){
+				//echo $p->price;
+					return false;}
+
+		return true;
+	}
+
 	public function import_new()
 	{
 		//echo("1. " . memory_get_usage()/1000000 . " MB <br>");
@@ -316,18 +342,37 @@ class BackController extends Controller {
 		$users = [];
 		$i = 0;
 		foreach ($workbook->createRowIterator($myWorksheetIndex) as $rowIndex => $values) {
-			if ($values[0] != "" && $values[0] != "ItemCode"){
+			if(Product::where('itemcode', '=', $values[0])->exists()){
+				$p = Product::where('itemcode', '=', $values[0])->first();
+				if (!$this->isSame($p, $values)){
+					//die("sama");
+					$p->description = $values[1];
+					$p->itemname = $values[2];
+					$p->model = $values[3];
+					$p->spec = $values[4];
+					$p->registrasi = $values[5];
+					$p->kurs = $values[6];
+					$p->price = $values[7];
+					$p->lastupdate = $date_now;
+					$p->save();
+				}
+			}else{
+				if ($values[0] != "" && $values[0] != "ItemCode"){
 				$users[] = [
-				'itemcode' => $values[0],
-				'description' => $values[1],
-				'itemname' => $values[2],
-				'model' => $values[3],
-				'spec' => $values[4],
-				'registrasi' => $values[5],
-				'kurs' => $values[6],
-				'price' => $values[7]
-				];
+					'itemcode' => $values[0],
+					'description' => $values[1],
+					'itemname' => $values[2],
+					'model' => $values[3],
+					'spec' => $values[4],
+					'registrasi' => $values[5],
+					'kurs' => $values[6],
+					'price' => $values[7],
+					'lastupdate' => $date_now,
+					];
+				}
 			}
+
+			
 			if ($rowIndex % 5000 == 0){
 				Product::insert($users);
 				$users = [];
@@ -339,6 +384,7 @@ class BackController extends Controller {
 			$i++;
 		}
 		Product::insert($users);
+		
 
 		$upload = new Upload();
 		$upload->name = $fileName;

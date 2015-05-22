@@ -93,6 +93,7 @@ Product list
 					<th>Registrasi</th>
 					<th>Kurs</th>
 					<th>Price</th>
+					<th>Last Updated</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -107,6 +108,7 @@ Product list
 					<td>{{ $key->registrasi }}</td>
 					<td>{{ $key->kurs }}</td>
 					<td>{{ $key->price }}</td>
+					<td>{{ $key->lastupdate }}</td>
 				</tr>
 				@endforeach
 			</tbody>
