@@ -14,8 +14,12 @@ use Session;
 use Hash;
 use Validator;
 use Auth;
+use View;
 
 use Akeneo\Component\SpreadsheetParser\SpreadsheetParser;
+use Box\Spout\Reader\ReaderFactory;
+use Box\Spout\Common\Type;
+use Box\Spout\Writer\WriterFactory;
 
 class BackController extends Controller {
 
@@ -246,6 +250,9 @@ class BackController extends Controller {
 			$query = $query->whereRaw("kurs regexp '".$term."'");
 		}
 
+		$jumlah = $query->count();
+		//die(var_dump($jumlah));
+
 		$products = $query->paginate(50);
 		$products->setPath('');
 		$pagination = $products->appends(array('code' => Input::get('code'),
@@ -265,7 +272,7 @@ class BackController extends Controller {
 			$this->rrmdir(storage_path('temp'));
 
         //die(var_dump(Input::all()));
-		return Theme::back('product')->with('products', $products)->with('pagination', $pagination)->with('terms', Input::all());
+		return Theme::back('product')->with('products', $products)->with('pagination', $pagination)->with('terms', Input::all())->with('jumlah', $jumlah);
 	}
 
 	function rrmdir($dir) { 
@@ -281,8 +288,44 @@ class BackController extends Controller {
 		} 
 	}
 
-	public function import_spout(){		
-		
+	public function import_spout(){
+		$reader = ReaderFactory::create(Type::XLSX);
+		$reader->open(storage_path()."\data.xlsx");
+
+		while ($reader->hasNextSheet()) {
+		    $reader->nextSheet();
+
+		    while ($reader->hasNextRow()) {
+		        $row = $reader->nextRow();
+		        // do stuff
+		    }
+		}
+
+		$reader->close();
+	}
+
+	public function export_spout(){		
+		set_time_limit(0);
+		$product = Product::all();
+
+		$writer = WriterFactory::create(Type::XLSX);
+
+		$writer->openToBrowser("Data.xlsx"); // stream data directly to the browser
+		$writer->addRow(array('ItemCode', 'Description', 'ItemName', 'Model', 'Spec', 'Registrasi', 'Kurs', 'Price'));
+		foreach ($product as $key => $value) {
+			$writer->addRow(array(
+				$value->itemcode,
+				$value->description,
+				$value->itemname,
+				$value->model,
+				$value->spec,
+				$value->registrasi,
+				$value->kurs,
+				$value->price
+				));
+		}
+
+		$writer->close();
 	}
 
 	function isSame($p, $v){
@@ -311,8 +354,28 @@ class BackController extends Controller {
 		return true;
 	}
 
+	function toNull($v){
+		foreach ($v as $key => $value) {
+			if ($value == "NULL")
+				$v[$key] = null;
+		}
+		return $v;
+	}
+
 	public function import_new()
 	{
+		$validate = Validator::make(Input::all(), array(
+			'file' 	=> 'required||mimes:xlsx',
+			));
+
+		if ($validate -> fails()){
+			$validate = Validator::make(Input::all(), array(
+				'file' 	=> 'required||mimes:xlsx',
+				'error' => 'required',
+				));
+			return redirect('product')->withErrors($validate)->withInput();
+		}
+
 		//echo("1. " . memory_get_usage()/1000000 . " MB <br>");
 		$time1 = microtime(true);
 		Session::put('progress', "Uploading...");
@@ -333,7 +396,7 @@ class BackController extends Controller {
 		set_time_limit(0);
 		//put shits HERE
 		
-		Product::truncate();
+		//Product::truncate();
 		Eloquent::unguard();
 		DB::disableQueryLog();
 		$workbook = SpreadsheetParser::open(storage_path('excel/exports/').$fileName);
@@ -342,23 +405,26 @@ class BackController extends Controller {
 		$users = [];
 		$i = 0;
 		foreach ($workbook->createRowIterator($myWorksheetIndex) as $rowIndex => $values) {
-			if(Product::where('itemcode', '=', $values[0])->exists()){
+			// $values = $this->toNull($values);
+			// echo(var_dump($values));
+			if ($values[0] != "" && $values[0] != "ItemCode"){
 				$p = Product::where('itemcode', '=', $values[0])->first();
-				if (!$this->isSame($p, $values)){
+				if($p != null){
+					if (!$this->isSame($p, $values)){
 					//die("sama");
-					$p->description = $values[1];
-					$p->itemname = $values[2];
-					$p->model = $values[3];
-					$p->spec = $values[4];
-					$p->registrasi = $values[5];
-					$p->kurs = $values[6];
-					$p->price = $values[7];
-					$p->lastupdate = $date_now;
-					$p->save();
-				}
-			}else{
-				if ($values[0] != "" && $values[0] != "ItemCode"){
-				$users[] = [
+						$p->description = $values[1];
+						$p->itemname = $values[2];
+						$p->model = $values[3];
+						$p->spec = $values[4];
+						$p->registrasi = $values[5];
+						$p->kurs = $values[6];
+						$p->price = $values[7];
+						$p->lastupdate = $date_now;
+						$p->save();
+					}
+				}else{
+
+					$users[] = [
 					'itemcode' => $values[0],
 					'description' => $values[1],
 					'itemname' => $values[2],
@@ -369,22 +435,23 @@ class BackController extends Controller {
 					'price' => $values[7],
 					'lastupdate' => $date_now,
 					];
-				}
-			}
 
-			
-			if ($rowIndex % 5000 == 0){
-				Product::insert($users);
-				$users = [];
+				}
+
+				if ($rowIndex % 5000 == 0){
+					Product::insert($users);
+					$users = [];
+				}
+				if ($rowIndex % 123 == 0){
+					Session::put('progress', $i . ' data processed');
+					Session::save();
+				}
+				$i++;
 			}
-			if ($rowIndex % 100 == 0){
-				Session::put('progress', $i . ' data processed');
-				Session::save();
-			}
-			$i++;
 		}
 		Product::insert($users);
-		
+		Session::put('progress', 'Finishing.');
+		Session::save();
 
 		$upload = new Upload();
 		$upload->name = $fileName;
@@ -392,7 +459,7 @@ class BackController extends Controller {
 		$upload->save();
 
 		$time2 = microtime(true);
-		echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
+		//echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
 		//die("memory sekarang " . memory_get_usage()/1000000 . " MB <br>");
 		return redirect('product');
 	}
@@ -402,6 +469,12 @@ class BackController extends Controller {
 		$upload = Upload::orderBy('date', 'DESC')->first();
 		$pathToFile = storage_path('excel/exports/').$upload->name;
 		return response()->download($pathToFile);
+	}
+
+	public function product_empty(){
+		Product::truncate();
+		$asd = "true";
+		return $this->product()->with('asd', $asd);	
 	}
 
 	/**
@@ -418,6 +491,20 @@ class BackController extends Controller {
 
 	public function news_create()
 	{
+		$validate = Validator::make(Input::all(), array(
+			'title' 	=> 'required',
+			'body' 	=> 'required',
+			));
+
+		if ($validate -> fails()){
+			$validate = Validator::make(Input::all(), array(
+				'title' 	=> 'required',
+				'body' 	=> 'required',
+				'error' => 'required',
+				));
+			return redirect('news')->withErrors($validate)->withInput();
+		}
+
 		//die(Input::get('news'));
 		$news = new News();
 		$news->title = Input::get('title');

@@ -27,19 +27,24 @@ Product list
 	@if(Auth::user()->role == "admin")
 	<li class="bg-primary">
 		<div class="top-info"><a data-toggle="modal" role="button" href="#iconified_modal">Import Data</a><small>import excel data</small></div>
-		<a data-toggle="modal" role="button" href="#iconified_modal"><i class="icon-download2"></i></a><span class="bottom-info bg-danger"></span>
+		<a data-toggle="modal" role="button" href="#iconified_modal"><i class="icon-download2"></i></a><span class="bottom-info bg-warning"></span>
 	</li>
 	@endif
 	<li class="bg-info">
 		<div class="top-info"><a data-toggle="modal" role="button" href="{{ URL('export') }}">Export Data</a><small>export excel data</small></div>
 		<a data-toggle="modal" role="button" href="{{ URL('export') }}"><i class="icon-upload2"></i></a><span class="bottom-info bg-success"></span>
 	</li>
+	@if(Auth::user()->role == "admin")
+	<li class="bg-danger pull-right">
+		<div class="top-info"><a data-toggle="modal" role="button" href="#modal-delete">Empty Data</a><small>delete all data</small></div>
+		<a data-toggle="modal" role="button" href="#modal-delete"><i class="icon-close"></i></a><span class="bottom-info bg-primary"></span>
+	</li>
+	@endif
 </ul>
 <div class="panel panel-default">
 	<div class="panel-heading">
-	<h6 class="panel-title panel-trigger"><a data-toggle="collapse" href="#question1"><i class="icon-search3"></i> Search</a></h6>
+	<h6 class="panel-title"><i class="icon-search3"></i> Search</a></h6>
 	</div>
-	<div id="question1" class="panel-collapse collapse">
 		<form method="post" action="{{URL('product')}}">
 		<input type="hidden" name="_token" value="{{ csrf_token() }}">
 		<div class="panel-body">
@@ -74,11 +79,11 @@ Product list
             </div>
 		</div>
 		</form>
-	</div>
 </div>
 <div class="panel panel-default">
 	<div class="panel-heading">
 		<h6 class="panel-title"><i class="icon-paragraph-justify"></i> Striped &amp; bordered datatable</h6>
+		<h6 class="panel-title pull-right"><i class="icon-info"></i> {{ $jumlah }} data found</h6>
 	</div>
 	<div class="datatable">
 		<table class="table table-striped table-bordered">
@@ -134,14 +139,15 @@ Product list
 				<ul>
 					<li>Hanya terdiri dari satu sheet</li>
 					<li>Tidak ada fungsi yang salah</li>
-					<li>Tidak ada kolom kosong</li>
+					<li>Tidak ada kolom/baris kosong</li>
 				</ul>
 				<hr>
 				<form action="{{URL::to('import')}}" method="post" enctype="multipart/form-data">
 				<input type="hidden" name="_token" value="{{{ csrf_token() }}}">
-					<div class="form-group">
+					<div class="form-group @if ($errors->has('error')) has-error @endif">
 						<label>File</label>
 						<input name="file" id="file" type="file" class="file btn-success" accept=".xlsx; .xls"></input>
+						@if ($errors->has('file')) <p class="help-block">{{ $errors->first('file') }}</p> @endif
 					</div>
 
 				</div>
@@ -149,23 +155,53 @@ Product list
 					<button class="btn btn-warning" data-dismiss="modal"><i class="icon-cancel-circle"></i> Cancel</button>
 					<button class="btn btn-primary" type="submit" value="Import" id="form-overview"><i class="icon-download2"></i> Import</button>
 				</form>
-				<div id="progress"></div>
 			</div>
+			<div id="progress" style="text-align: center;"></div>
 		</div>
 	</div>
 </div>
 <!-- /iconified modal -->
+<div id="modal-delete" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title"><i class="icon-close"></i> Empty data</h4>
+			</div>
+			<div class="modal-body with-padding">
+				<h5><i class="icon-warning"></i> Data akan dikosongkan, anda yakin?</h5>
+				<ul>
+					<li>Data pada database akan dihapus</li>
+					<li>Pastikan telah melakukan backup/export data sekarang</li>
+				</ul>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-warning" data-dismiss="modal"><i class="icon-cancel-circle"></i> Cancel</button>
+				<a class="btn btn-primary" href="{{ URL('empty') }}"><i class="icon-close"></i> Empty</a>
+			</div>
+			<div id="progress" style="text-align: center;"></div>
+		</div>
+	</div>
+</div>
 @stop
 
 @section('footerExtraScript')
 <script type="text/javascript">
+	@if (isset($asd))
+		$.jGrowl('Data successfully deleted', { sticky: true, theme: 'growl-success', header: 'Success!' });
+	@endif
+	@if($errors->has('error'))
+	$(window).load(function(){
+        $('#iconified_modal').modal('show');
+    });
+	@endif
 	$(document).ready(function() {
 		$("#form-overview").click( function(){
 			var element = document.getElementById("progress");
 			setInterval(
 				function(){
 					$.get( "processing-status", function( data ) {
-						element.innerHTML = data;
+						element.innerHTML = "Status : "+data;
 					});
 				},500
 			);

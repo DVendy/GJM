@@ -21,8 +21,9 @@ Route::get('/', 'BackController@index');
 Route::get('product', 'BackController@product');
 Route::post('product', 'BackController@product');
 
-Route::get('export', 'BackController@export');
+Route::get('export', 'BackController@export_spout');
 Route::post('import', 'BackController@import_new');
+Route::get('empty', 'BackController@product_empty');
 Route::get('/processing-status', function()
 {
     return Session::get('progress');

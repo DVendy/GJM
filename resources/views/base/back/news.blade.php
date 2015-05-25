@@ -81,10 +81,14 @@ News list
 			<form method="post" action="{{URL('news')}}">
 				<input type="hidden" name="_token" value="{{ csrf_token() }}">
 				<div class="modal-body with-padding">
-					<div class="form-group">
+					<div class="form-group @if ($errors->has('title')) has-error @endif">
 						<input type="text" class="form-control" placeholder="Title" name="title">
+						@if ($errors->has('title')) <p class="help-block">{{ $errors->first('title') }}</p> @endif
 					</div>
 					<textarea class="form-control" placeholder="Enter text ..." name="body"></textarea>
+					<div class="form-group @if ($errors->has('body')) has-error @endif">
+						@if ($errors->has('body')) <p class="help-block">{{ $errors->first('body') }}</p> @endif
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button class="btn btn-warning" data-dismiss="modal">Close</button>
@@ -141,6 +145,11 @@ News list
 
 @section('footerExtraScript')
 <script type="text/javascript">
+	@if($errors->has('error'))
+	$(window).load(function(){
+        $('#iconified_modal').modal('show');
+    });
+    @endif
 	$(document).ready(function() {
 		$(".delete_news").click(function(event){
 			$("#delete_news").prop('href', 'news/delete-' + event.target.id);
