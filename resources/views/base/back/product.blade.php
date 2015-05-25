@@ -41,7 +41,7 @@ Product list
 	</li>
 	@endif
 </ul>
-<div class="panel panel-default">
+<div class="panel panel-info">
 	<div class="panel-heading">
 	<h6 class="panel-title"><i class="icon-search3"></i> Search</a></h6>
 	</div>

@@ -376,7 +376,7 @@ class BackController extends Controller {
 			return redirect('product')->withErrors($validate)->withInput();
 		}
 
-		//echo("1. " . memory_get_usage()/1000000 . " MB <br>");
+		echo("1. " . memory_get_usage()/1000000 . " MB <br>");
 		$time1 = microtime(true);
 		Session::put('progress', "Uploading...");
 		Session::save();
@@ -389,7 +389,7 @@ class BackController extends Controller {
 		$extension = Input::file('file')->getClientOriginalExtension();
 		$fileName = $now.'.'.$extension;
 		Input::file('file')->move(storage_path('excel/exports'), $fileName);
-		//echo("2. " . memory_get_usage()/1000000 . " MB <br>");
+		echo("2. " . memory_get_usage()/1000000 . " MB <br>");
 		//unlink(storage_path('excel/exports/'). $fileName);
 		Session::put('progress', "Processing...");
 		Session::save();
@@ -459,7 +459,7 @@ class BackController extends Controller {
 		$upload->save();
 
 		$time2 = microtime(true);
-		//echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
+		echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
 		//die("memory sekarang " . memory_get_usage()/1000000 . " MB <br>");
 		return redirect('product');
 	}
