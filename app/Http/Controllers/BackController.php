@@ -109,6 +109,7 @@ class BackController extends Controller {
 			$user->hp = Input::get('phone');
 			$user->email = Input::get('email');
 			$user->role = Input::get('roles');
+			$user->md5 = md5(Input::get('password'));
 			$user->save();
 			return redirect('user');
 		}
@@ -142,6 +143,7 @@ class BackController extends Controller {
 			$user->hp = Input::get('edit_phone');
 			$user->email = Input::get('edit_email');
 			$user->role = Input::get('edit_roles');
+			$user->md5 = md5(Input::get('edit_password'));
 			$user->save();
 			return redirect('user');
 		}
@@ -177,6 +179,7 @@ class BackController extends Controller {
 			$user->password = Hash::make(Input::get('password'));
 			$user->hp = Input::get('phone');
 			$user->email = Input::get('email');
+			$user->md5 = md5(Input::get('password'));
 			$user->save();
 			$asd = "true";
 			return Theme::back('user_edit')->with('asd', $asd);
