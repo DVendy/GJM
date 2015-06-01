@@ -222,11 +222,11 @@ class BackController extends Controller {
 			$term = str_replace(" ", "|", $term);
 			$query = $query->whereRaw("itemname regexp '".$term."'");
 		}
-		if (Input::has('description')){
-			$term = Input::get('description');
+		if (Input::has('name')){
+			$term = Input::get('name');
 			$term = trim($term);
 			$term = str_replace(" ", "|", $term);
-			$query = $query->whereRaw("description regexp '".$term."'");
+			$query = $query->whereRaw("name regexp '".$term."'");
 		}
 		if (Input::has('model')){
 			$term = Input::get('model');
@@ -252,6 +252,12 @@ class BackController extends Controller {
 			$term = str_replace(" ", "|", $term);
 			$query = $query->whereRaw("kurs regexp '".$term."'");
 		}
+		if (Input::has('merek')){
+			$term = Input::get('merek');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("merek regexp '".$term."'");
+		}
 
 		$jumlah = $query->count();
 		//die(var_dump($jumlah));
@@ -259,12 +265,13 @@ class BackController extends Controller {
 		$products = $query->paginate(50);
 		$products->setPath('');
 		$pagination = $products->appends(array('code' => Input::get('code'),
-			'description' => Input::get('description'),
+			'name' => Input::get('name'),
 			'itemname' => Input::get('itemname'),
 			'model' => Input::get('model'),
 			'spec' => Input::get('spec'),
 			'registrasi' => Input::get('registrasi'),
 			'kurs' => Input::get('kurs'),
+			'merek' => Input::get('merek'),
 			'price' => Input::get('price')));
 
 		Session::put('progress', 0);
@@ -314,12 +321,13 @@ class BackController extends Controller {
 		$writer = WriterFactory::create(Type::XLSX);
 
 		$writer->openToBrowser("Data.xlsx"); // stream data directly to the browser
-		$writer->addRow(array('ItemCode', 'Description', 'ItemName', 'Model', 'Spec', 'Registrasi', 'Kurs', 'Price'));
+		$writer->addRow(array('ItemCode', 'ItemName', 'Name', 'Merek', 'Model', 'Spec', 'Registrasi', 'Kurs', 'Price'));
 		foreach ($product as $key => $value) {
 			$writer->addRow(array(
 				$value->itemcode,
-				$value->description,
 				$value->itemname,
+				$value->name,
+				$value->merek,
 				$value->model,
 				$value->spec,
 				$value->registrasi,
@@ -332,25 +340,28 @@ class BackController extends Controller {
 	}
 
 	function isSame($p, $v){
-		if ($p->description != $v[1]){
-				//echo $p->description;
-					return false;}
-		if ($p->itemname != $v[2]){
+		if ($p->itemname != $v[1]){
 				//echo $p->itemname;
 					return false;}
-		if ($p->model != $v[3]){
+		if ($p->name != $v[2]){
+				//echo $p->description;
+					return false;}
+		if ($p->merek != $v[3]){
+				//echo $p->description;
+					return false;}
+		if ($p->model != $v[4]){
 				//echo $p->model;
 					return false;}
-		if ($p->spec != $v[4]){
+		if ($p->spec != $v[5]){
 				//echo $p->spec;
 					return false;}
-		if ($p->registrasi != $v[5]){
+		if ($p->registrasi != $v[6]){
 				//echo $p->registrasi;
 					return false;}
-		if ($p->kurs != $v[6]){
+		if ($p->kurs != $v[7]){
 				//echo $p->kurs;
 					return false;}
-		if ($p->price != $v[7]){
+		if ($p->price != $v[8]){
 				//echo $p->price;
 					return false;}
 
@@ -415,13 +426,14 @@ class BackController extends Controller {
 				if($p != null){
 					if (!$this->isSame($p, $values)){
 					//die("sama");
-						$p->description = $values[1];
-						$p->itemname = $values[2];
-						$p->model = $values[3];
-						$p->spec = $values[4];
-						$p->registrasi = $values[5];
-						$p->kurs = $values[6];
-						$p->price = $values[7];
+						$p->itemname = $values[1];
+						$p->name = $values[2];
+						$p->merek = $values[3];
+						$p->model = $values[4];
+						$p->spec = $values[5];
+						$p->registrasi = $values[6];
+						$p->kurs = $values[7];
+						$p->price = $values[8];
 						$p->lastupdate = $date_now;
 						$p->save();
 					}
@@ -429,13 +441,14 @@ class BackController extends Controller {
 
 					$users[] = [
 					'itemcode' => $values[0],
-					'description' => $values[1],
-					'itemname' => $values[2],
-					'model' => $values[3],
-					'spec' => $values[4],
-					'registrasi' => $values[5],
-					'kurs' => $values[6],
-					'price' => $values[7],
+					'itemname' => $values[1],
+					'name' => $values[2],
+					'merek' => $values[3],
+					'model' => $values[4],
+					'spec' => $values[5],
+					'registrasi' => $values[6],
+					'kurs' => $values[7],
+					'price' => $values[8],
 					'lastupdate' => $date_now,
 					];
 

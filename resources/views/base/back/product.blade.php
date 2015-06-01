@@ -53,15 +53,18 @@ Product list
 					<input type="text" class="form-control" placeholder="Item Code" name="code">
 				</div>
 				<div class="col-md-2">
-					<input type="text" class="form-control" placeholder="Description" name="description">
+					<input type="text" class="form-control" placeholder="Item Name" name="itemname">
+				</div>
+				<div class="col-md-1">
+					<input type="text" class="form-control" placeholder="Name" name="name">
 				</div>
 				<div class="col-md-2">
-					<input type="text" class="form-control" placeholder="Item Name" name="itemname">
+					<input type="text" class="form-control" placeholder="Merek" name="merek">
 				</div>
 				<div class="col-md-1">
 					<input type="text" class="form-control" placeholder="Model" name="model">
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-2">
 					<input type="text" class="form-control" placeholder="Spec" name="spec">
 				</div>
 				<div class="col-md-1">
@@ -91,8 +94,9 @@ Product list
 				<tr>
 					<th>#</th>
 					<th>Item Code</th>
-					<th>Description</th>
 					<th>Item Name</th>
+					<th>Name</th>
+					<th>Merek</th>
 					<th>Model</th>
 					<th>Spec</th>
 					<th>Registrasi</th>
@@ -106,8 +110,9 @@ Product list
 				<tr>
 					<td>{{ $key->id}}</td>
 					<td>{{ $key->itemcode }}</td>
-					<td>{{ $key->description }}</td>
 					<td>{{ $key->itemname }}</td>
+					<td>{{ $key->name }}</td>
+					<td>{{ $key->merek }}</td>
 					<td>{{ $key->model }}</td>
 					<td>{{ $key->spec }}</td>
 					<td>{{ $key->registrasi }}</td>
