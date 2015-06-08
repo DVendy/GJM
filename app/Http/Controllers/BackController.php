@@ -368,6 +368,35 @@ class BackController extends Controller {
 		return true;
 	}
 
+	function isSame2($p, $v){
+		if ($p->itemname != $v['itemname']){
+				//echo $p->itemname;
+					return false;}
+		if ($p->name != $v['name']){
+				//echo $p->description;
+					return false;}
+		if ($p->merek != $v['merek']){
+				//echo $p->description;
+					return false;}
+		if ($p->model != $v['model']){
+				//echo $p->model;
+					return false;}
+		if ($p->spec != $v['spec']){
+				//echo $p->spec;
+					return false;}
+		if ($p->registrasi != $v['registrasi']){
+				//echo $p->registrasi;
+					return false;}
+		if ($p->kurs != $v['kurs']){
+				//echo $p->kurs;
+					return false;}
+		if ($p->price != $v['price']){
+				//echo $p->price;
+					return false;}
+
+		return true;
+	}
+
 	function toNull($v){
 		foreach ($v as $key => $value) {
 			if ($value == "NULL")
@@ -378,6 +407,7 @@ class BackController extends Controller {
 
 	public function import_new()
 	{
+		$time1 = microtime(true);
 		$validate = Validator::make(Input::all(), array(
 			'file' 	=> 'required||mimes:xlsx',
 			));
@@ -476,8 +506,168 @@ class BackController extends Controller {
 
 		$time2 = microtime(true);
 		echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
-		//die("memory sekarang " . memory_get_usage()/1000000 . " MB <br>");
+		die("memory sekarang " . memory_get_usage()/1000000 . " MB <br>");
 		return redirect('product');
+	}
+
+	public function import_v2()
+	{
+		$time1 = microtime(true);
+		$validate = Validator::make(Input::all(), array(
+			'file' 	=> 'required||mimes:xlsx',
+			));
+
+		if ($validate -> fails()){
+			$validate = Validator::make(Input::all(), array(
+				'file' 	=> 'required||mimes:xlsx',
+				'error' => 'required',
+				));
+			return redirect('product')->withErrors($validate)->withInput();
+		}
+
+		$time1 = microtime(true);
+		Session::put('progress', "Uploading...");
+		Session::save();
+
+		$date_now = Carbon::now();
+		$now = $date_now->toDateTimeString();
+		$now = str_replace(" ","_", $now);
+		$now = str_replace(":","-", $now);
+
+		$extension = Input::file('file')->getClientOriginalExtension();
+		$fileName = $now.'.'.$extension;
+		Input::file('file')->move(storage_path('excel/exports'), $fileName);
+		echo("2. " . memory_get_usage()/1000000 . " MB <br>");
+		//unlink(storage_path('excel/exports/'). $fileName);
+		Session::put('progress', "Processing...");
+		Session::save();
+		set_time_limit(0);
+		//put shits HERE
+		
+		//Product::truncate();
+		Eloquent::unguard();
+		DB::disableQueryLog();
+		$workbook = SpreadsheetParser::open(storage_path('excel/exports/').$fileName);
+
+		$myWorksheetIndex = $workbook->getWorksheetIndex('Sheet1');
+		$a = [];
+		$i = 0;
+		foreach ($workbook->createRowIterator($myWorksheetIndex) as $rowIndex => $values) {
+			// $values = $this->toNull($values);
+			// echo(var_dump($values));
+			if ($values[0] != "" && $values[0] != "ItemCode"){
+				$a[] = [
+					'itemcode' => $values[0],
+					'itemname' => $values[1],
+					'name' => $values[2],
+					'merek' => $values[3],
+					'model' => $values[4],
+					'spec' => $values[5],
+					'registrasi' => $values[6],
+					'kurs' => $values[7],
+					'price' => $values[8],
+					'lastupdate' => $date_now,
+					];
+			}
+
+			if ($rowIndex % 5000 == 0){
+				$code = [];
+			    foreach($a as $sub) {
+			        $code[] = $sub['itemcode'];
+			    } 
+			    $update = Product::whereIn('itemcode', $code)->get();
+			   
+			    $code = [];
+			    foreach ($update as $key) {
+			    	$code[] = $key->itemcode;
+			    }
+			    foreach ($update as $key) {
+			    	$asd = $this->getSung($a, $key->itemcode);
+			    	if (!$this->isSame2($key, $asd)){
+			    		$key->itemname = $asd['itemname'];
+						$key->name = $asd['name'];
+						$key->merek = $asd['merek'];
+						$key->model = $asd['model'];
+						$key->spec = $asd['spec'];
+						$key->registrasi = $asd['registrasi'];
+						$key->kurs = $asd['kurs'];
+						$key->price = $asd['price'];
+						$key->lastupdate = $date_now;
+						$key->save();
+			    	}
+			    }
+			    //NEW
+			    $new = [];
+			    foreach($a as $key) {
+			        if (!in_array($key['itemcode'], $code))
+			        	$new[] = $key;
+			    } 
+			    Product::insert($new);
+
+			    $a = [];
+			}
+
+			if ($rowIndex % 123 == 0){
+				Session::put('progress', $i . ' data processed');
+				Session::save();
+			}
+			$i++;
+		}
+
+		$code = [];
+	    foreach($a as $sub) {
+	        $code[] = $sub['itemcode'];
+	    } 
+	    $update = Product::whereIn('itemcode', $code)->get();
+	   
+	    $code = [];
+	    foreach ($update as $key) {
+	    	$code[] = $key->itemcode;
+	    }
+	    foreach ($update as $key) {
+	    	$asd = $this->getSung($a, $key->itemcode);
+	    	if (!$this->isSame2($key, $asd)){
+	    		$key->itemname = $asd['itemname'];
+				$key->name = $asd['name'];
+				$key->merek = $asd['merek'];
+				$key->model = $asd['model'];
+				$key->spec = $asd['spec'];
+				$key->registrasi = $asd['registrasi'];
+				$key->kurs = $asd['kurs'];
+				$key->price = $asd['price'];
+				$key->lastupdate = $date_now;
+				$key->save();
+	    	}
+	    }
+	    //NEW
+	    $new = [];
+	    foreach($a as $key) {
+	        if (!in_array($key['itemcode'], $code))
+	        	$new[] = $key;
+	    } 
+	    Product::insert($new);
+
+	    $a = [];
+
+		Session::put('progress', 'Finishing.');
+		Session::save();
+
+		$upload = new Upload();
+		$upload->name = $fileName;
+		$upload->date = $date_now;
+		$upload->save();
+
+		$time2 = microtime(true);
+		echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
+		die("memory sekarang " . memory_get_usage()/1000000 . " MB <br>");
+		return redirect('product');
+	}
+
+	public function getSung($a, $update){
+		foreach($a as $index => $data) {
+	        if($data['itemcode'] == $update) return $a[$index];
+	    }
+	    return FALSE;
 	}
 
 	public function export()

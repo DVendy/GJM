@@ -22,7 +22,7 @@ Route::get('product', 'BackController@product');
 Route::post('product', 'BackController@product');
 
 Route::get('export', 'BackController@export_spout');
-Route::post('import', 'BackController@import_new');
+Route::post('import', 'BackController@import_v2');
 Route::get('empty', 'BackController@product_empty');
 Route::get('/processing-status', function()
 {
