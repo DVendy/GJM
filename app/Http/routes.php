@@ -28,6 +28,10 @@ Route::get('/processing-status', function()
 {
     return Session::get('progress');
 });
+Route::get('/progress_export', function()
+{
+    return Session::get('progress_export');
+});
 
 //News
 Route::get('news', 'BackController@news');

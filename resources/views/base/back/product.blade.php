@@ -31,8 +31,8 @@ Product list
 	</li>
 	@endif
 	<li class="bg-info">
-		<div class="top-info"><a data-toggle="modal" role="button" href="{{ URL('export') }}">Export Data</a><small>export excel data</small></div>
-		<a data-toggle="modal" role="button" href="{{ URL('export') }}"><i class="icon-upload2"></i></a><span class="bottom-info bg-success"></span>
+		<div class="top-info"><a data-toggle="modal" role="button" href="{{ URL('export') }}" id="form-export">Export Data</a><small>export excel data</small></div>
+		<a data-toggle="modal" role="button" href="{{ URL('export') }}" id="form-export-2"><i class="icon-upload2"></i></a><span class="bottom-info bg-success"></span>
 	</li>
 	@if(Auth::user()->role == "admin")
 	<li class="bg-danger pull-right">
@@ -206,6 +206,26 @@ Product list
 			setInterval(
 				function(){
 					$.get( "processing-status", function( data ) {
+						element.innerHTML = "Status : "+data;
+					});
+				},500
+			);
+		});
+		$("#form-export").click( function(){
+			var element = document.getElementById("form-export");
+			setInterval(
+				function(){
+					$.get( "progress_export", function( data ) {
+						element.innerHTML = "Status : "+data;
+					});
+				},500
+			);
+		});
+		$("#form-export2").click( function(){
+			var element = document.getElementById("form-export");
+			setInterval(
+				function(){
+					$.get( "progress_export", function( data ) {
 						element.innerHTML = "Status : "+data;
 					});
 				},500

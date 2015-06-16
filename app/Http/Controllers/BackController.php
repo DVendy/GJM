@@ -298,30 +298,25 @@ class BackController extends Controller {
 		} 
 	}
 
-	public function import_spout(){
-		$reader = ReaderFactory::create(Type::XLSX);
-		$reader->open(storage_path()."\data.xlsx");
-
-		while ($reader->hasNextSheet()) {
-		    $reader->nextSheet();
-
-		    while ($reader->hasNextRow()) {
-		        $row = $reader->nextRow();
-		        // do stuff
-		    }
-		}
-
-		$reader->close();
-	}
-
 	public function export_spout(){		
 		set_time_limit(0);
 		$product = Product::all();
-
+		$count = Product::count();
+		//var_dump($count);
+		//echo (1/$count);
+		//die();
 		$writer = WriterFactory::create(Type::XLSX);
 
-		$writer->openToBrowser("Data.xlsx"); // stream data directly to the browser
+		$date_now = Carbon::now();
+		$now = $date_now->toDateTimeString();
+		$now = str_replace(" ","_", $now);
+		$now = str_replace(":","-", $now);
+
+
+
+		$writer->openToBrowser($now.".xlsx"); // stream data directly to the browser
 		$writer->addRow(array('ItemCode', 'ItemName', 'Name', 'Merek', 'Model', 'Spec', 'Registrasi', 'Kurs', 'Price'));
+		$i = 0;
 		foreach ($product as $key => $value) {
 			$writer->addRow(array(
 				$value->itemcode,
@@ -334,6 +329,11 @@ class BackController extends Controller {
 				$value->kurs,
 				$value->price
 				));
+			if ($i % 456 == 0){
+				Session::put('progress_export', round(($i / $count * 100),2). " %");
+				Session::save();
+			}
+			$i++;
 		}
 
 		$writer->close();
@@ -397,119 +397,6 @@ class BackController extends Controller {
 		return true;
 	}
 
-	function toNull($v){
-		foreach ($v as $key => $value) {
-			if ($value == "NULL")
-				$v[$key] = null;
-		}
-		return $v;
-	}
-
-	public function import_new()
-	{
-		$time1 = microtime(true);
-		$validate = Validator::make(Input::all(), array(
-			'file' 	=> 'required||mimes:xlsx',
-			));
-
-		if ($validate -> fails()){
-			$validate = Validator::make(Input::all(), array(
-				'file' 	=> 'required||mimes:xlsx',
-				'error' => 'required',
-				));
-			return redirect('product')->withErrors($validate)->withInput();
-		}
-
-		echo("1. " . memory_get_usage()/1000000 . " MB <br>");
-		$time1 = microtime(true);
-		Session::put('progress', "Uploading...");
-		Session::save();
-
-		$date_now = Carbon::now();
-		$now = $date_now->toDateTimeString();
-		$now = str_replace(" ","_", $now);
-		$now = str_replace(":","-", $now);
-
-		$extension = Input::file('file')->getClientOriginalExtension();
-		$fileName = $now.'.'.$extension;
-		Input::file('file')->move(storage_path('excel/exports'), $fileName);
-		echo("2. " . memory_get_usage()/1000000 . " MB <br>");
-		//unlink(storage_path('excel/exports/'). $fileName);
-		Session::put('progress', "Processing...");
-		Session::save();
-		set_time_limit(0);
-		//put shits HERE
-		
-		//Product::truncate();
-		Eloquent::unguard();
-		DB::disableQueryLog();
-		$workbook = SpreadsheetParser::open(storage_path('excel/exports/').$fileName);
-
-		$myWorksheetIndex = $workbook->getWorksheetIndex('Sheet1');
-		$users = [];
-		$i = 0;
-		foreach ($workbook->createRowIterator($myWorksheetIndex) as $rowIndex => $values) {
-			// $values = $this->toNull($values);
-			// echo(var_dump($values));
-			if ($values[0] != "" && $values[0] != "ItemCode"){
-				$p = Product::where('itemcode', '=', $values[0])->first();
-				if($p != null){
-					if (!$this->isSame($p, $values)){
-					//die("sama");
-						$p->itemname = $values[1];
-						$p->name = $values[2];
-						$p->merek = $values[3];
-						$p->model = $values[4];
-						$p->spec = $values[5];
-						$p->registrasi = $values[6];
-						$p->kurs = $values[7];
-						$p->price = $values[8];
-						$p->lastupdate = $date_now;
-						$p->save();
-					}
-				}else{
-
-					$users[] = [
-					'itemcode' => $values[0],
-					'itemname' => $values[1],
-					'name' => $values[2],
-					'merek' => $values[3],
-					'model' => $values[4],
-					'spec' => $values[5],
-					'registrasi' => $values[6],
-					'kurs' => $values[7],
-					'price' => $values[8],
-					'lastupdate' => $date_now,
-					];
-
-				}
-
-				if ($rowIndex % 5000 == 0){
-					Product::insert($users);
-					$users = [];
-				}
-				if ($rowIndex % 123 == 0){
-					Session::put('progress', $i . ' data processed');
-					Session::save();
-				}
-				$i++;
-			}
-		}
-		Product::insert($users);
-		Session::put('progress', 'Finishing.');
-		Session::save();
-
-		$upload = new Upload();
-		$upload->name = $fileName;
-		$upload->date = $date_now;
-		$upload->save();
-
-		$time2 = microtime(true);
-		echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
-		die("memory sekarang " . memory_get_usage()/1000000 . " MB <br>");
-		return redirect('product');
-	}
-
 	public function import_v2()
 	{
 		$time1 = microtime(true);
@@ -555,7 +442,7 @@ class BackController extends Controller {
 		foreach ($workbook->createRowIterator($myWorksheetIndex) as $rowIndex => $values) {
 			// $values = $this->toNull($values);
 			// echo(var_dump($values));
-			if ($values[0] != "" && $values[0] != "ItemCode"){
+			if ($values[0] != "" && $values[0] != "ItemCode" && !strpos($values[0], "'") && !strpos($values[0], "\"")){
 				$a[] = [
 					'itemcode' => $values[0],
 					'itemname' => $values[1],
@@ -574,7 +461,7 @@ class BackController extends Controller {
 				$code = [];
 			    foreach($a as $sub) {
 			        $code[] = $sub['itemcode'];
-			    } 
+			    }
 			    $update = Product::whereIn('itemcode', $code)->get();
 			   
 			    $code = [];
@@ -607,7 +494,7 @@ class BackController extends Controller {
 			    $a = [];
 			}
 
-			if ($rowIndex % 123 == 0){
+			if ($rowIndex % 234 == 0){
 				Session::put('progress', $i . ' data processed');
 				Session::save();
 			}
@@ -680,7 +567,7 @@ class BackController extends Controller {
 	public function product_empty(){
 		Product::truncate();
 		$asd = "true";
-		return $this->product()->with('asd', $asd);	
+		return redirect('product');
 	}
 
 	/**
