@@ -39,6 +39,10 @@ Product list
 		<div class="top-info"><a data-toggle="modal" role="button" href="#modal-delete">Empty Data</a><small>delete all data</small></div>
 		<a data-toggle="modal" role="button" href="#modal-delete"><i class="icon-close"></i></a><span class="bottom-info bg-primary"></span>
 	</li>
+	<li class="bg-warning pull-right">
+		<div class="top-info"><a data-toggle="modal" role="button" href="{{ URL('getLastUpload') }}">Get Last Upload</a><small>get last uploaded/imported excel</small></div>
+		<a data-toggle="modal" role="button" href="{{ URL('getLastUpload') }}"><i class="icon-file-excel"></i></a><span class="bottom-info bg-primary"></span>
+	</li>
 	@endif
 </ul>
 <div class="panel panel-info">
@@ -50,36 +54,43 @@ Product list
 		<div class="panel-body">
 			<div class="form-group" style="margin-right: -15px; margin-bottom: 50px;">
 				<div class="col-md-1">
-					<input type="text" class="form-control" placeholder="Item Code" name="code">
+					<input type="text" class="form-control" placeholder="Item Code" name="code" value="{{ $terms[0] }}">
 				</div>
 				<div class="col-md-2">
-					<input type="text" class="form-control" placeholder="Item Name" name="itemname">
+					<input type="text" class="form-control" placeholder="Item Name" name="itemname" value="{{ $terms[2] }}">
 				</div>
 				<div class="col-md-1">
-					<input type="text" class="form-control" placeholder="Name" name="name">
+					<input type="text" class="form-control" placeholder="Name" name="name" value="{{ $terms[3] }}">
 				</div>
 				<div class="col-md-2">
-					<input type="text" class="form-control" placeholder="Merek" name="merek">
+					<select data-placeholder="Pilih merek" class="form-control" name="merek" value="{{ $terms[8] }}">
+						<option selected="selected" value="Merek">Merek (all)</option>
+					@foreach($merek as $key)
+						<option {{ $terms[8] == $key ? 'selected="selected"' : ''}}>{{ $key }}</option>
+					@endforeach
+					</select>
 				</div>
 				<div class="col-md-1">
-					<input type="text" class="form-control" placeholder="Model" name="model">
+					<input type="text" class="form-control" placeholder="Model" name="model" value="{{ $terms[4] }}">
 				</div>
 				<div class="col-md-2">
-					<input type="text" class="form-control" placeholder="Spec" name="spec">
+					<input type="text" class="form-control" placeholder="Spec" name="spec" value="{{ $terms[5] }}">
 				</div>
 				<div class="col-md-1">
-					<input type="text" class="form-control" placeholder="Registrasi" name="registrasi">
+					<input type="text" class="form-control" placeholder="Registrasi" name="registrasi" value="{{ $terms[6] }}">
 				</div>
 				<div class="col-md-1">
-					<input type="text" class="form-control" placeholder="Kurs" name="kurs">
+					<input type="text" class="form-control" placeholder="Kurs" name="kurs" value="{{ $terms[7] }}">
 				</div>
 				<div class="col-md-1">
-					<input type="text" class="form-control" placeholder="Price" name="price">
+					<input type="text" class="form-control" placeholder="Price" name="price" value="{{ $terms[1] }}">
 				</div>
 			</div>
 			<div class="form-actions text-right">
+	            <a href="{{URL('product')}}" class="btn btn-danger"><i class="icon-close"></i> Reset</a>
 	            <button type="submit" class="btn btn-success"><i class="icon-search3"></i> Search</button>
             </div>
+
 		</div>
 		</form>
 </div>
@@ -221,7 +232,7 @@ Product list
 				},500
 			);
 		});
-		$("#form-export2").click( function(){
+		$("#form-export-2").click( function(){
 			var element = document.getElementById("form-export");
 			setInterval(
 				function(){

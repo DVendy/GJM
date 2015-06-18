@@ -53,15 +53,18 @@ class BackController extends Controller {
 	public function index()
 	{
 		$users = User::all();
+		$product = Product::count();
+		$update = Upload::all()->first();
 		
 		foreach ($users as $key => $value) {
 			if ($value->role != "admin" && $value->login_h->count() != 0)
 				$top[$value->name] = $value->login_h->count();
 		}
 		arsort($top);
-		//var_dump($top);
-		//die();
-		return Theme::back('index')->with('top', $top);
+		$date = date_create_from_format('Y-m-d H:i:s', $update->date);
+		//  var_dump($date);
+		// die();
+		return Theme::back('index')->with('top', $top)->with('product', $product)->with('update', $date);
 	}
 
 	/**
@@ -204,63 +207,77 @@ class BackController extends Controller {
 	{
 		//die("lol");
 		$query = new Product();
+		$terms = [];
+		for ($i=0; $i < 9; $i++) { 
+			$terms[] = '';
+		}
+
 		if (Input::has('code')){
 			$term = Input::get('code');
 			$term = trim($term);
 			$term = str_replace(" ", "|", $term);
 			$query = $query->whereRaw("itemcode regexp '".$term."'");
+			$terms[0] = Input::get('code');
 		}
 		if (Input::has('price')){
 			$term = Input::get('price');
 			$term = trim($term);
 			$term = str_replace(" ", "|", $term);
 			$query = $query->whereRaw("price regexp '".$term."'");
+			$terms[1] = Input::get('price');
 		}
 		if (Input::has('itemname')){
 			$term = Input::get('itemname');
 			$term = trim($term);
 			$term = str_replace(" ", "|", $term);
 			$query = $query->whereRaw("itemname regexp '".$term."'");
+			$terms[2] = Input::get('itemname');
 		}
 		if (Input::has('name')){
 			$term = Input::get('name');
 			$term = trim($term);
 			$term = str_replace(" ", "|", $term);
 			$query = $query->whereRaw("name regexp '".$term."'");
+			$terms[3] = Input::get('name');
 		}
 		if (Input::has('model')){
 			$term = Input::get('model');
 			$term = trim($term);
 			$term = str_replace(" ", "|", $term);
 			$query = $query->whereRaw("model regexp '".$term."'");
+			$terms[4] = Input::get('model');
 		}
 		if (Input::has('spec')){
 			$term = Input::get('spec');
 			$term = trim($term);
 			$term = str_replace(" ", "|", $term);
 			$query = $query->whereRaw("spec regexp '".$term."'");
+			$terms[5] = Input::get('spec');
 		}
 		if (Input::has('registrasi')){
 			$term = Input::get('registrasi');
 			$term = trim($term);
 			$term = str_replace(" ", "|", $term);
 			$query = $query->whereRaw("registrasi regexp '".$term."'");
+			$terms[6] = Input::get('registrasi');
 		}
 		if (Input::has('kurs')){
 			$term = Input::get('kurs');
 			$term = trim($term);
 			$term = str_replace(" ", "|", $term);
 			$query = $query->whereRaw("kurs regexp '".$term."'");
+			$terms[7] = Input::get('kurs');
 		}
 		if (Input::has('merek')){
-			$term = Input::get('merek');
-			$term = trim($term);
-			$term = str_replace(" ", "|", $term);
-			$query = $query->whereRaw("merek regexp '".$term."'");
+			if (Input::get('merek') != "Merek"){
+				$term = Input::get('merek');
+				$query = $query->whereRaw("merek = '".$term."'");
+				$terms[8] = Input::get('merek');
+			}
 		}
 
 		$jumlah = $query->count();
-		//die(var_dump($jumlah));
+		//die(var_dump($terms));
 
 		$products = $query->paginate(50);
 		$products->setPath('');
@@ -276,13 +293,22 @@ class BackController extends Controller {
 
 		Session::put('progress', 0);
 		Session::save();
+		Session::put('progress_export', 0);
+		Session::save();
+
+		$mereks = Product::select('merek')->groupBy('merek')->get()->toArray() ;
+		$merek = [];
+		foreach ($mereks as $key => $value) {
+			$merek[] = $value['merek'];
+		}
+		// var_dump($merek);
+		// die();
 
 		//$this->rrmdir(storage_path('temp'));
 		if (file_exists(storage_path('temp')))
 			$this->rrmdir(storage_path('temp'));
 
-        //die(var_dump(Input::all()));
-		return Theme::back('product')->with('products', $products)->with('pagination', $pagination)->with('terms', Input::all())->with('jumlah', $jumlah);
+		return Theme::back('product')->with('products', $products)->with('pagination', $pagination)->with('terms', $terms)->with('jumlah', $jumlah)->with('merek', $merek);
 	}
 
 	function rrmdir($dir) { 
@@ -301,12 +327,13 @@ class BackController extends Controller {
 	public function export_spout(){		
 		set_time_limit(0);
 		$product = Product::all();
+// 		echo("mem. " . memory_get_usage()/1000000 . " MB <br>");
+// die("LOL");
 		$count = Product::count();
 		//var_dump($count);
 		//echo (1/$count);
 		//die();
 		$writer = WriterFactory::create(Type::XLSX);
-
 		$date_now = Carbon::now();
 		$now = $date_now->toDateTimeString();
 		$now = str_replace(" ","_", $now);
@@ -337,6 +364,8 @@ class BackController extends Controller {
 		}
 
 		$writer->close();
+		// echo("mem. " . memory_get_usage()/1000000 . " MB <br>");
+		// die("LOL");
 	}
 
 	function isSame($p, $v){
@@ -457,12 +486,8 @@ class BackController extends Controller {
 					];
 			}
 
-			if ($rowIndex % 5000 == 0){
-				$code = [];
-			    foreach($a as $sub) {
-			        $code[] = $sub['itemcode'];
-			    }
-			    $update = Product::whereIn('itemcode', $code)->get();
+			if ($rowIndex % 1000 == 0){
+			    $update = Product::whereIn('itemcode', array_column($a, 'itemcode'))->get();
 			   
 			    $code = [];
 			    foreach ($update as $key) {
@@ -539,6 +564,7 @@ class BackController extends Controller {
 		Session::put('progress', 'Finishing.');
 		Session::save();
 
+		Upload::truncate();
 		$upload = new Upload();
 		$upload->name = $fileName;
 		$upload->date = $date_now;
@@ -557,9 +583,9 @@ class BackController extends Controller {
 	    return FALSE;
 	}
 
-	public function export()
+	public function getLastUpload()
 	{
-		$upload = Upload::orderBy('date', 'DESC')->first();
+		$upload = Upload::first();
 		$pathToFile = storage_path('excel/exports/').$upload->name;
 		return response()->download($pathToFile);
 	}

@@ -1,19 +1,4 @@
-==import new==
-5000 data empty
-1. 10.408688 MB
-2. 10.83424 MB
-sampai masukin ke db: 27.47
-memory sekarang 14.2896 MB 
----------------------------------
-
-5000 data update 10 row
-1. 10.4096 MB
-2. 10.835176 MB
-sampai masukin ke db: 91.24
-memory sekarang 14.23756 MB 
-====================================================================================
-
-==import v2==
+"5000 iterasi"
 
 5000 data empty
 sampai masukin ke db: 14.12
@@ -23,9 +8,6 @@ memory sekarang 14.315064 MB
 sampai masukin ke db: 76.03
 memory sekarang 15.381824 MB 
 
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-==import v2==
 27543 data empty
 sampai masukin ke db: 85.24
 memory sekarang 33.358552 MB 
@@ -33,3 +15,25 @@ memory sekarang 33.358552 MB
 27543 data with update
 sampai masukin ke db: 381.96
 memory sekarang 47.969704 MB 
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+"2500 iterasi"
+
+27535 data empty
+sampai masukin ke db: 67.36
+memory sekarang 27.975864 MB 
+
+27535 data with update
+sampai masukin ke db: 327.78
+memory sekarang 28.917096 MB 
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+"1000 iterasi"
+
+27535 data empty
+sampai masukin ke db: 58.7
+memory sekarang 29.275848 MB 
+
+27535 data with update
+sampai masukin ke db: 300.02
+memory sekarang 32.704536 MB 

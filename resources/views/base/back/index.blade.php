@@ -50,7 +50,27 @@
 		</div>
 	</div>
 	<div class="col-md-6">
-		
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h6 class="panel-title"><i class="icon-database2"></i> Database</h6>
+			</div>
+			<div class="datatable">
+				<table class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th>Jumlah data</th>
+							<th>Terakhir diperbaharui</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>{{ $product }}</td>
+							<td>{{ date_format($update, "l, d F Y") }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
 	</div>
 </div>
 @stop
