@@ -17,6 +17,7 @@ Product list
 @stop
 
 @section('body')
+
 <div class="breadcrumb-line">
 	<ul class="breadcrumb">
 		<li><a href="{{ URL('/') }}">Home</a></li>
@@ -177,6 +178,40 @@ Product list
 	</div>
 </div>
 <!-- /iconified modal -->
+@if(isset($new) && isset($update) && isset($salah))
+<div id="modal-info" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title"><i class="icon-info"></i> Import result</h4>
+			</div>
+			<div class="modal-body with-padding">
+				<h5><i class="icon-info"></i> Berikut hasil dari import:</h5>
+				<ul>
+					<li>Data baru : {{ $new }}</li>
+					<li>Data terupdate : {{ $update }}</li>
+					@if(count($salah) > 0)
+					<li>Data salah : {{ count($salah) }}</li>
+					<li>Baris salah :
+						<ul>
+						@foreach($salah as $key)
+							<li>{{ $key }}</li>
+						@endforeach
+						</ul>
+					</li>
+					@endif
+				</ul>
+			</div>
+			<div class="modal-footer">
+				<a class="btn btn-warning" href="{{ URL('product') }}"><i class="icon-checkmark"></i> Ok</a>
+			</div>
+			<div id="progress" style="text-align: center;"></div>
+		</div>
+	</div>
+</div>
+@endif
+
 <div id="modal-delete" class="modal fade" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-sm">
 		<div class="modal-content">
@@ -206,11 +241,19 @@ Product list
 	@if (isset($asd))
 		$.jGrowl('Data successfully deleted', { sticky: true, theme: 'growl-success', header: 'Success!' });
 	@endif
+
 	@if($errors->has('error'))
 	$(window).load(function(){
         $('#iconified_modal').modal('show');
     });
 	@endif
+
+	@if (isset($success))
+	$(window).load(function(){
+        $('#modal-info').modal('show');
+    });
+	@endif
+
 	$(document).ready(function() {
 		$("#form-overview").click( function(){
 			var element = document.getElementById("progress");

@@ -15,6 +15,7 @@ use Hash;
 use Validator;
 use Auth;
 use View;
+use Redirect;
 
 use Akeneo\Component\SpreadsheetParser\SpreadsheetParser;
 use Box\Spout\Reader\ReaderFactory;
@@ -305,8 +306,12 @@ class BackController extends Controller {
 		// die();
 
 		//$this->rrmdir(storage_path('temp'));
-		if (file_exists(storage_path('temp')))
-			$this->rrmdir(storage_path('temp'));
+		try{
+			if (file_exists(storage_path('temp')))
+				$this->rrmdir(storage_path('temp'));
+		}catch(\Exception $e){
+			
+		}
 
 		return Theme::back('product')->with('products', $products)->with('pagination', $pagination)->with('terms', $terms)->with('jumlah', $jumlah)->with('merek', $merek);
 	}
@@ -453,7 +458,7 @@ class BackController extends Controller {
 		$extension = Input::file('file')->getClientOriginalExtension();
 		$fileName = $now.'.'.$extension;
 		Input::file('file')->move(storage_path('excel/exports'), $fileName);
-		echo("2. " . memory_get_usage()/1000000 . " MB <br>");
+		//echo("2. " . memory_get_usage()/1000000 . " MB <br>");
 		//unlink(storage_path('excel/exports/'). $fileName);
 		Session::put('progress', "Processing...");
 		Session::save();
@@ -467,11 +472,13 @@ class BackController extends Controller {
 
 		$myWorksheetIndex = $workbook->getWorksheetIndex('Sheet1');
 		$a = [];
-		$i = 0;
+		$salah = [];
+		$cNew = 0;
+		$cUpdate = 0;
 		foreach ($workbook->createRowIterator($myWorksheetIndex) as $rowIndex => $values) {
 			// $values = $this->toNull($values);
-			// echo(var_dump($values));
-			if ($values[0] != "" && $values[0] != "ItemCode" && !strpos($values[0], "'") && !strpos($values[0], "\"")){
+			//echo(var_dump($values));
+			if (($values[0] != "") && ($values[0] != "ItemCode") && (!strpos($values[0], "'") !== false) && (!strpos($values[0], '"') !== false)){
 				$a[] = [
 					'itemcode' => $values[0],
 					'itemname' => $values[1],
@@ -484,6 +491,8 @@ class BackController extends Controller {
 					'price' => $values[8],
 					'lastupdate' => $date_now,
 					];
+			}else{
+				$salah[] = $rowIndex;
 			}
 
 			if ($rowIndex % 1000 == 0){
@@ -506,13 +515,16 @@ class BackController extends Controller {
 						$key->price = $asd['price'];
 						$key->lastupdate = $date_now;
 						$key->save();
+						$cUpdate++;
 			    	}
 			    }
 			    //NEW
 			    $new = [];
 			    foreach($a as $key) {
-			        if (!in_array($key['itemcode'], $code))
+			        if (!in_array($key['itemcode'], $code)){
 			        	$new[] = $key;
+			        	$cNew++;
+			        }
 			    } 
 			    Product::insert($new);
 
@@ -520,11 +532,11 @@ class BackController extends Controller {
 			}
 
 			if ($rowIndex % 234 == 0){
-				Session::put('progress', $i . ' data processed');
+				Session::put('progress', $rowIndex . ' data processed');
 				Session::save();
 			}
-			$i++;
 		}
+		//die();
 
 		$code = [];
 	    foreach($a as $sub) {
@@ -549,13 +561,16 @@ class BackController extends Controller {
 				$key->price = $asd['price'];
 				$key->lastupdate = $date_now;
 				$key->save();
+				$cUpdate++;
 	    	}
 	    }
 	    //NEW
 	    $new = [];
 	    foreach($a as $key) {
-	        if (!in_array($key['itemcode'], $code))
+	        if (!in_array($key['itemcode'], $code)){
 	        	$new[] = $key;
+	        	$cNew++;
+	        }
 	    } 
 	    Product::insert($new);
 
@@ -571,9 +586,122 @@ class BackController extends Controller {
 		$upload->save();
 
 		$time2 = microtime(true);
-		echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
-		die("memory sekarang " . memory_get_usage()/1000000 . " MB <br>");
-		return redirect('product');
+		//echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
+		//die("memory sekarang " . memory_get_usage()/1000000 . " MB <br>");
+
+		unset($salah[0]);
+		//return redirect('product')->with('salah', $salah)->with('new', $cNew)->with('update', $cUpdate)->with('success', true);
+		//return Redirect::action('BackController@product', array('upload' => 1, 'salah' => $salah, 'new'=> $cNew, 'update' => $cUpdate))->with('sung', "true");
+
+		//DESPERATE
+		$query = new Product();
+		$terms = [];
+		for ($i=0; $i < 9; $i++) { 
+			$terms[] = '';
+		}
+
+		if (Input::has('code')){
+			$term = Input::get('code');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("itemcode regexp '".$term."'");
+			$terms[0] = Input::get('code');
+		}
+		if (Input::has('price')){
+			$term = Input::get('price');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("price regexp '".$term."'");
+			$terms[1] = Input::get('price');
+		}
+		if (Input::has('itemname')){
+			$term = Input::get('itemname');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("itemname regexp '".$term."'");
+			$terms[2] = Input::get('itemname');
+		}
+		if (Input::has('name')){
+			$term = Input::get('name');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("name regexp '".$term."'");
+			$terms[3] = Input::get('name');
+		}
+		if (Input::has('model')){
+			$term = Input::get('model');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("model regexp '".$term."'");
+			$terms[4] = Input::get('model');
+		}
+		if (Input::has('spec')){
+			$term = Input::get('spec');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("spec regexp '".$term."'");
+			$terms[5] = Input::get('spec');
+		}
+		if (Input::has('registrasi')){
+			$term = Input::get('registrasi');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("registrasi regexp '".$term."'");
+			$terms[6] = Input::get('registrasi');
+		}
+		if (Input::has('kurs')){
+			$term = Input::get('kurs');
+			$term = trim($term);
+			$term = str_replace(" ", "|", $term);
+			$query = $query->whereRaw("kurs regexp '".$term."'");
+			$terms[7] = Input::get('kurs');
+		}
+		if (Input::has('merek')){
+			if (Input::get('merek') != "Merek"){
+				$term = Input::get('merek');
+				$query = $query->whereRaw("merek = '".$term."'");
+				$terms[8] = Input::get('merek');
+			}
+		}
+
+		$jumlah = $query->count();
+		//die(var_dump($terms));
+
+		$products = $query->paginate(50);
+		$products->setPath('');
+		$pagination = $products->appends(array('code' => Input::get('code'),
+			'name' => Input::get('name'),
+			'itemname' => Input::get('itemname'),
+			'model' => Input::get('model'),
+			'spec' => Input::get('spec'),
+			'registrasi' => Input::get('registrasi'),
+			'kurs' => Input::get('kurs'),
+			'merek' => Input::get('merek'),
+			'price' => Input::get('price')));
+
+		Session::put('progress', 0);
+		Session::save();
+		Session::put('progress_export', 0);
+		Session::save();
+
+		$mereks = Product::select('merek')->groupBy('merek')->get()->toArray() ;
+		$merek = [];
+		foreach ($mereks as $key => $value) {
+			$merek[] = $value['merek'];
+		}
+		// var_dump($merek);
+		// die();
+
+		//$this->rrmdir(storage_path('temp'));
+
+		try{
+			if (file_exists(storage_path('temp')))
+				$this->rrmdir(storage_path('temp'));
+		}catch(\Exception $e){
+
+		}
+
+		return Theme::back('product')->with('products', $products)->with('pagination', $pagination)->with('terms', $terms)->with('jumlah', $jumlah)->with('merek', $merek)->with('salah', $salah)->with('new', $cNew)->with('update', $cUpdate)->with('success', true);
 	}
 
 	public function getSung($a, $update){
@@ -593,7 +721,8 @@ class BackController extends Controller {
 	public function product_empty(){
 		Product::truncate();
 		$asd = "true";
-		return redirect('product');
+		//return redirect('product')->with('asd', $asd);
+		return Redirect::action('BackController@product', array('delete' => 1));
 	}
 
 	/**
