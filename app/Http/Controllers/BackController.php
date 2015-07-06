@@ -61,16 +61,21 @@ class BackController extends Controller {
 
 		$date_now = Carbon::now();
 		//expired
-		$expired = Product::where('expired', '<=', $date_now)->get();
+		$cExpired = Product::where('expired', '<=', $date_now)->count();
+		$expired = Product::where('expired', '<=', $date_now)->paginate(100);
 
 		//expired dalam 6 bulan
-		$expired6 = Product::where('expired', '<=', $date_now->copy()->addMonths(6))->where('expired', '>=', $date_now)->get();
+		$cExpired6 = Product::where('expired', '<=', $date_now->copy()->addMonths(6))->count();
+		$expired6 = Product::where('expired', '<=', $date_now->copy()->addMonths(6))->where('expired', '>=', $date_now)->paginate(100);
 
 		//baru dalam 6 bulan
-		$new = Product::where('created_at', '>=', $date_now->copy()->subMonths(6))->get();
+		$cNew = Product::where('created_at', '>=', $date_now->copy()->subMonths(6))->count();
+		//echo $cNew;
+
+		$new = Product::where('created_at', '>=', $date_now->copy()->subMonths(6))->paginate(100);
 		
-		//die();
-		return Theme::back('index')->with('product', $product)->with('update', $date)->with('expired', $expired)->with('expired6', $expired6)->with('new', $new);
+		// die();
+		return Theme::back('index')->with('product', $product)->with('update', $date)->with('expired', $expired)->with('expired6', $expired6)->with('new', $new)->with('cExpired', $cExpired)->with('cExpired6', $cExpired6)->with('cNew', $cNew);
 	}
 
 	/**
@@ -526,6 +531,8 @@ class BackController extends Controller {
 			    foreach ($update as $key) {
 			    	$code[] = $key->itemcode;
 			    }
+			    //UPDATE
+			    $updateSung = [];
 			    foreach ($update as $key) {
 			    	$asd = $this->getSung($a, $key->itemcode);
 			    	if (!$this->isSame2($key, $asd)){
@@ -538,10 +545,12 @@ class BackController extends Controller {
 						$key->kurs = $asd['kurs'];
 						$key->price = $asd['price'];
 						$key->lastupdate = $date_now;
-						$key->save();
+						$updateSung[] = $key;
+						//$key->save();
 						$cUpdate++;
 			    	}
 			    }
+			    Product::insert($updateSung);
 			    //NEW
 			    $new = [];
 			    foreach($a as $key) {
@@ -610,8 +619,8 @@ class BackController extends Controller {
 		$upload->save();
 
 		$time2 = microtime(true);
-		//echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
-		//die("memory sekarang " . memory_get_usage()/1000000 . " MB <br>");
+		echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
+		die("memory sekarang " . memory_get_usage()/1000000 . " MB <br>");
 
 		unset($salah[0]);
 		//return redirect('product')->with('salah', $salah)->with('new', $cNew)->with('update', $cUpdate)->with('success', true);

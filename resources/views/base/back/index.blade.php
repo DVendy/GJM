@@ -42,16 +42,16 @@
 </div>
 <div class="tabbable page-tabs">
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="#activity" data-toggle="tab"><i class="icon-info"></i> Barang baru dalam 6 bulan terakhir <span class="label label-success">{{ $new->count() }}</span></a></li>
-		<li><a href="#contacts" data-toggle="tab"><i class="icon-warning"></i> Barang yang akan kadaluarsa dalam 6 bulan <span class="label label-warning">{{ $expired6->count() }}</span></a></li>
-		<li><a href="#tasks" data-toggle="tab"><i class="icon-close"></i> Barang yang sudah kadaluarsa <span class="label label-danger">{{ $expired->count() }}</span></a></li>
+		<li class="active"><a href="#activity" data-toggle="tab"><i class="icon-info"></i> Barang baru dalam 6 bulan terakhir <span class="label label-success">{{ $cNew }}</span></a></li>
+		<li><a href="#contacts" data-toggle="tab"><i class="icon-warning"></i> Barang yang akan kadaluarsa dalam 6 bulan <span class="label label-warning">{{ $cExpired6 }}</span></a></li>
+		<li><a href="#tasks" data-toggle="tab"><i class="icon-close"></i> Barang yang sudah kadaluarsa <span class="label label-danger">{{ $cExpired }}</span></a></li>
 	</ul>
 	<div class="tab-content">
 		<div class="tab-pane active fade in" id="activity">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h6 class="panel-title"><i class="icon-paragraph-justify"></i></h6>
-					<h6 class="panel-title pull-right"><i class="icon-info"></i> {{ $new->count() }} data found</h6>
+					<h6 class="panel-title pull-right"><i class="icon-info"></i> {{ $cNew }} data found</h6>
 				</div>
 				<div class="datatable">
 					<table class="table table-striped table-bordered">
@@ -100,12 +100,15 @@
 					</table>
 				</div>
 			</div>
+			<div class="text-center block">
+				{!! $new->render() !!}
+			</div>
 		</div>
 		<div class="tab-pane fade" id="contacts">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h6 class="panel-title"><i class="icon-paragraph-justify"></i></h6>
-					<h6 class="panel-title pull-right"><i class="icon-info"></i> {{ $expired6->count() }} data found</h6>
+					<h6 class="panel-title pull-right"><i class="icon-info"></i> {{ $cExpired6 }} data found</h6>
 				</div>
 				<div class="datatable">
 					<table class="table table-striped table-bordered">
@@ -154,12 +157,15 @@
 					</table>
 				</div>
 			</div>
+			<div class="text-center block">
+			{!! $expired6->render() !!}
+			</div>
 		</div>
 		<div class="tab-pane fade" id="tasks">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h6 class="panel-title"><i class="icon-paragraph-justify"></i></h6>
-					<h6 class="panel-title pull-right"><i class="icon-info"></i> {{ $expired->count() }} data found</h6>
+					<h6 class="panel-title pull-right"><i class="icon-info"></i> {{ $cExpired }} data found</h6>
 				</div>
 				<div class="datatable">
 					<table class="table table-striped table-bordered">
@@ -207,6 +213,9 @@
 						</tbody>
 					</table>
 				</div>
+			</div>
+			<div class="text-center block">
+			{!! $expired->render() !!}
 			</div>
 		</div>
 	</div>
