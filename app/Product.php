@@ -14,5 +14,5 @@ class Product extends Model {
 	/*
 		Product Properties belongs here.....
 	*/
-	protected $fillable = ['itemcode', 'description', 'itemname', 'model', 'spec', 'registrasi', 'kurs', 'price', 'lastupdate'];
+	protected $fillable = ['itemcode', 'description', 'itemname', 'model', 'spec', 'registrasi', 'kurs', 'price', 'lastupdate', 'created_at'];
 }

@@ -114,7 +114,9 @@ Product list
 					<th>Registrasi</th>
 					<th>Kurs</th>
 					<th>Price</th>
+					<th>Created At</th>
 					<th>Last Updated</th>
+					<th>Expired</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -130,7 +132,9 @@ Product list
 					<td>{{ $key->registrasi }}</td>
 					<td>{{ $key->kurs }}</td>
 					<td>{{ $key->price }}</td>
+					<td>{{ $key->created_at }}</td>
 					<td>{{ $key->lastupdate }}</td>
+					<td>{{ $key->expired }}</td>
 				</tr>
 				@endforeach
 			</tbody>
@@ -180,24 +184,31 @@ Product list
 <!-- /iconified modal -->
 @if(isset($new) && isset($update) && isset($salah))
 <div id="modal-info" class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
-	<div class="modal-dialog modal-sm">
+	<div class="modal-dialog modal-sm" style="width: 350px;">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 				<h4 class="modal-title"><i class="icon-info"></i> Import result</h4>
 			</div>
 			<div class="modal-body with-padding">
-				<h5><i class="icon-info"></i> Berikut hasil dari import:</h5>
+				<h4><i class="icon-info"></i> Berikut hasil dari import:</h4>
 				<ul>
 					<li>Data baru : {{ $new }}</li>
 					<li>Data terupdate : {{ $update }}</li>
 					@if(count($salah) > 0)
-					<li>Data salah : {{ count($salah) }}</li>
-					<li>Baris salah :
+					<li>Jumlah data salah : {{ count($salah) }}</li>
+					<li>Baris salah : mengandung karakter ilegal
 						<ul>
 						@foreach($salah as $key)
-							<li>{{ $key }}</li>
+							<li>{{ $key[0] }} : <b>{{ $key[1] }}</b></li>
 						@endforeach
+						</ul>
+					</li>
+					&nbsp
+					<li>Karakter ilegal :
+						<ul>
+							<li><b>'</b> : Petik satu</li>
+							<li><b>"</b> : Petik dua</li>
+							<li><b>\</b> : Backslash</li>
 						</ul>
 					</li>
 					@endif

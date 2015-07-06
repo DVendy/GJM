@@ -53,19 +53,24 @@ class BackController extends Controller {
 	 */
 	public function index()
 	{
-		$users = User::all();
 		$product = Product::count();
 		$update = Upload::all()->first();
 		
-		foreach ($users as $key => $value) {
-			if ($value->role != "admin" && $value->login_h->count() != 0)
-				$top[$value->name] = $value->login_h->count();
-		}
-		arsort($top);
 		$date = date_create_from_format('Y-m-d H:i:s', $update->date);
 		//  var_dump($date);
-		// die();
-		return Theme::back('index')->with('top', $top)->with('product', $product)->with('update', $date);
+
+		$date_now = Carbon::now();
+		//expired
+		$expired = Product::where('expired', '<=', $date_now)->get();
+
+		//expired dalam 6 bulan
+		$expired6 = Product::where('expired', '<=', $date_now->copy()->addMonths(6))->where('expired', '>=', $date_now)->get();
+
+		//baru dalam 6 bulan
+		$new = Product::where('created_at', '>=', $date_now->copy()->subMonths(6))->get();
+		
+		//die();
+		return Theme::back('index')->with('product', $product)->with('update', $date)->with('expired', $expired)->with('expired6', $expired6)->with('new', $new);
 	}
 
 	/**
@@ -427,8 +432,20 @@ class BackController extends Controller {
 		if ($p->price != $v['price']){
 				//echo $p->price;
 					return false;}
+		if ($p->expired != $v['expired']){
+				//echo $p->price;
+					return false;}
 
 		return true;
+	}
+
+	public function namaHash($s){
+		if (strpos($s, "#") !== false){
+			for ($i=0; $i <= strpos($s, "#"); $i++) { 
+				$s[$i] = '';
+			}
+		}
+		return $s;
 	}
 
 	public function import_v2()
@@ -473,12 +490,16 @@ class BackController extends Controller {
 		$myWorksheetIndex = $workbook->getWorksheetIndex('Sheet1');
 		$a = [];
 		$salah = [];
+		$s_baris = [];
 		$cNew = 0;
 		$cUpdate = 0;
 		foreach ($workbook->createRowIterator($myWorksheetIndex) as $rowIndex => $values) {
 			// $values = $this->toNull($values);
 			//echo(var_dump($values));
-			if (($values[0] != "") && ($values[0] != "ItemCode") && (!strpos($values[0], "'") !== false) && (!strpos($values[0], '"') !== false)){
+			if (($values[0] != "") && ($values[0] != "ItemCode") && (!strpos($values[0], "'") !== false) && (!strpos($values[0], '"') !== false) && (!strpos($values[0], '\\') !== false)){
+				$values[2] = $this->namaHash($values[2]);
+
+//semua data masukin ke $a
 				$a[] = [
 					'itemcode' => $values[0],
 					'itemname' => $values[1],
@@ -490,14 +511,17 @@ class BackController extends Controller {
 					'kurs' => $values[7],
 					'price' => $values[8],
 					'lastupdate' => $date_now,
+					'created_at' => $date_now,
+					'expired' => $values[9],
 					];
 			}else{
-				$salah[] = $rowIndex;
+				$salah[] = [$rowIndex, $values[0]];
 			}
 
 			if ($rowIndex % 1000 == 0){
+//ambil semua barang yg itemcodenya ada di $a
 			    $update = Product::whereIn('itemcode', array_column($a, 'itemcode'))->get();
-			   
+//$code isinya semua itemcode dari yg update
 			    $code = [];
 			    foreach ($update as $key) {
 			    	$code[] = $key->itemcode;
