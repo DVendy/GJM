@@ -2,14 +2,14 @@
 
 use Illuminate\Database\Eloquent\Model;
 
-class Product extends Model {
+class Backup extends Model {
 
 	/**
 	 * The database table used by the model.
 	 *
 	 * @var string
 	 */
-	protected $table = 'barang';
+	protected $table = 'barang_backup';
 
 	/*
 		Product Properties belongs here.....

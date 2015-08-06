@@ -1,6 +1,7 @@
 <?php
 use App\News;
 use App\User;
+use App\Kurs;
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -25,6 +26,7 @@ Route::get('export', 'BackController@export_spout');
 Route::get('getLastUpload', 'BackController@getLastUpload');
 Route::post('import', 'BackController@import_v2');
 Route::get('empty', 'BackController@product_empty');
+Route::get('rollback', 'ProductController@rollback');
 Route::get('/processing-status', function()
 {
     return Session::get('progress');
@@ -88,6 +90,29 @@ Route::get('login', 'AuthController@showLogin');
 Route::post('login', 'AuthController@doLogin');
 Route::get('logout', 'AuthController@doLogout');
 Route::get('editprofile', 'AuthController@editProfile');
+
+//KURS
+Route::get('kurs', 'KursController@index');
+Route::post('kurs_create', 'KursController@kurs_create');
+Route::post('kurs_update', 'KursController@kurs_update');
+Route::post('kurs_update_mass', 'KursController@kurs_update_mass');
+Route::get('kurs/delete-{id}', 'KursController@kurs_delete');
+Route::get('/kurs/{id}/id', function($id)
+{
+    return Kurs::find($id)->id;
+});
+Route::get('/kurs/{id}/code', function($id)
+{
+    return Kurs::find($id)->code;
+});
+Route::get('/kurs/{id}/name', function($id)
+{
+    return Kurs::find($id)->name;
+});
+Route::get('/kurs/{id}/value', function($id)
+{
+    return Kurs::find($id)->index;
+});
 
 
 //--- API

@@ -8,6 +8,7 @@ use App\Upload;
 use App\News;
 use App\User;
 use App\Login_H;
+use App\Backup;
 use Eloquent;
 use DB;
 use Session;
@@ -68,14 +69,20 @@ class BackController extends Controller {
 		$cExpired6 = Product::where('expired', '<=', $date_now->copy()->addMonths(6))->count();
 		$expired6 = Product::where('expired', '<=', $date_now->copy()->addMonths(6))->where('expired', '>=', $date_now)->paginate(100);
 
-		//baru dalam 6 bulan
-		$cNew = Product::where('created_at', '>=', $date_now->copy()->subMonths(6))->count();
+		//baru
+		$cNew = Product::where('status', '=', 3)->count();
 		//echo $cNew;
 
-		$new = Product::where('created_at', '>=', $date_now->copy()->subMonths(6))->paginate(100);
+		$new = Product::where('status', '=', 3)->paginate(100);
+
+		//baru
+		$cDis = Product::where('status', '=', 1)->orwhere('status', '=', 10)->count();
+		//echo $cNew;
+
+		$dis = Product::where('status', '=', 1)->orwhere('status', '=', 10)->paginate(100);
 		
 		// die();
-		return Theme::back('index')->with('product', $product)->with('update', $date)->with('expired', $expired)->with('expired6', $expired6)->with('new', $new)->with('cExpired', $cExpired)->with('cExpired6', $cExpired6)->with('cNew', $cNew);
+		return Theme::back('index')->with('product', $product)->with('update', $date)->with('expired', $expired)->with('expired6', $expired6)->with('new', $new)->with('cExpired', $cExpired)->with('cExpired6', $cExpired6)->with('cNew', $cNew)->with('cDis', $cDis)->with('dis', $dis);
 	}
 
 	/**
@@ -312,6 +319,9 @@ class BackController extends Controller {
 		foreach ($mereks as $key => $value) {
 			$merek[] = $value['merek'];
 		}
+
+		$canRollback = Upload::where('status', '=', 1)->count();
+
 		// var_dump($merek);
 		// die();
 
@@ -323,7 +333,7 @@ class BackController extends Controller {
 			
 		}
 
-		return Theme::back('product')->with('products', $products)->with('pagination', $pagination)->with('terms', $terms)->with('jumlah', $jumlah)->with('merek', $merek);
+		return Theme::back('product')->with('products', $products)->with('pagination', $pagination)->with('terms', $terms)->with('jumlah', $jumlah)->with('merek', $merek)->with('canRollback', $canRollback);
 	}
 
 	function rrmdir($dir) { 
@@ -437,8 +447,7 @@ class BackController extends Controller {
 		if ($p->price != $v['price']){
 				//echo $p->price;
 					return false;}
-		if ($p->expired != $v['expired']){
-				//echo $p->price;
+		if ($p->expired != $v['expired']->format('Y-m-d H:i:s')){
 					return false;}
 
 		return true;
@@ -482,14 +491,20 @@ class BackController extends Controller {
 		Input::file('file')->move(storage_path('excel/exports'), $fileName);
 		//echo("2. " . memory_get_usage()/1000000 . " MB <br>");
 		//unlink(storage_path('excel/exports/'). $fileName);
+
 		Session::put('progress', "Processing...");
 		Session::save();
 		set_time_limit(0);
 		//put shits HERE
 		
-		//Product::truncate();
+		Backup::truncate();
+		DB::statement("INSERT INTO barang_backup SELECT * FROM barang;");
+
 		Eloquent::unguard();
 		DB::disableQueryLog();
+		Product::where('status', '=', 1) ->update(['status' => 10]);
+		Product::where('status', '!=', 10) ->update(['status' => 1]);
+
 		$workbook = SpreadsheetParser::open(storage_path('excel/exports/').$fileName);
 
 		$myWorksheetIndex = $workbook->getWorksheetIndex('Sheet1');
@@ -532,29 +547,39 @@ class BackController extends Controller {
 			    	$code[] = $key->itemcode;
 			    }
 			    //UPDATE
-			    $updateSung = [];
+			    //$updateSung = [];
 			    foreach ($update as $key) {
 			    	$asd = $this->getSung($a, $key->itemcode);
 			    	if (!$this->isSame2($key, $asd)){
 			    		$key->itemname = $asd['itemname'];
-						$key->name = $asd['name'];
-						$key->merek = $asd['merek'];
-						$key->model = $asd['model'];
-						$key->spec = $asd['spec'];
-						$key->registrasi = $asd['registrasi'];
-						$key->kurs = $asd['kurs'];
-						$key->price = $asd['price'];
-						$key->lastupdate = $date_now;
-						$updateSung[] = $key;
-						//$key->save();
-						$cUpdate++;
+			    		$key->name = $asd['name'];
+			    		$key->merek = $asd['merek'];
+			    		$key->model = $asd['model'];
+			    		$key->spec = $asd['spec'];
+			    		$key->registrasi = $asd['registrasi'];
+			    		$key->kurs = $asd['kurs'];
+			    		$key->price = $asd['price'];
+			    		$key->lastupdate = $date_now;
+			    		$key->expired = $asd['expired'];
+
+			    		if ($key->expired < $date_now)
+			    			$key->status = 20;
+			    		else
+			    			$key->status = 21;
+			    		
+			    		$key->save();
+			    		$cUpdate++;
+			    	}else{
+			    		$key->status = 0;
+			    		$key->save();
 			    	}
 			    }
-			    Product::insert($updateSung);
+			    //Product::insert($updateSung);
 			    //NEW
 			    $new = [];
 			    foreach($a as $key) {
 			        if (!in_array($key['itemcode'], $code)){
+			        	$key['status'] = 3;
 			        	$new[] = $key;
 			        	$cNew++;
 			        }
@@ -593,14 +618,25 @@ class BackController extends Controller {
 				$key->kurs = $asd['kurs'];
 				$key->price = $asd['price'];
 				$key->lastupdate = $date_now;
+				$key->expired = $asd['expired'];
+
+				if ($key->expired < $date_now)
+					$key->status = 20;
+				else
+					$key->status = 21;
+
 				$key->save();
 				$cUpdate++;
+	    	}else{
+	    		$key->status = 0;
+	    		$key->save();
 	    	}
 	    }
 	    //NEW
 	    $new = [];
 	    foreach($a as $key) {
 	        if (!in_array($key['itemcode'], $code)){
+	        	$key['status'] = 3;
 	        	$new[] = $key;
 	        	$cNew++;
 	        }
@@ -612,15 +648,17 @@ class BackController extends Controller {
 		Session::put('progress', 'Finishing.');
 		Session::save();
 
-		Upload::truncate();
+		//Upload::truncate();
+		Upload::where('status', '!=', 99) ->update(['status' => 0]);
 		$upload = new Upload();
 		$upload->name = $fileName;
 		$upload->date = $date_now;
+		$upload->status = 1;
 		$upload->save();
 
-		$time2 = microtime(true);
-		echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
-		die("memory sekarang " . memory_get_usage()/1000000 . " MB <br>");
+		// $time2 = microtime(true);
+		// echo "sampai masukin ke db: ". round(($time2-$time1), 2). "<br>"; //value in seconds
+		// die("memory sekarang " . memory_get_usage()/1000000 . " MB <br>");
 
 		unset($salah[0]);
 		//return redirect('product')->with('salah', $salah)->with('new', $cNew)->with('update', $cUpdate)->with('success', true);
@@ -631,70 +669,6 @@ class BackController extends Controller {
 		$terms = [];
 		for ($i=0; $i < 9; $i++) { 
 			$terms[] = '';
-		}
-
-		if (Input::has('code')){
-			$term = Input::get('code');
-			$term = trim($term);
-			$term = str_replace(" ", "|", $term);
-			$query = $query->whereRaw("itemcode regexp '".$term."'");
-			$terms[0] = Input::get('code');
-		}
-		if (Input::has('price')){
-			$term = Input::get('price');
-			$term = trim($term);
-			$term = str_replace(" ", "|", $term);
-			$query = $query->whereRaw("price regexp '".$term."'");
-			$terms[1] = Input::get('price');
-		}
-		if (Input::has('itemname')){
-			$term = Input::get('itemname');
-			$term = trim($term);
-			$term = str_replace(" ", "|", $term);
-			$query = $query->whereRaw("itemname regexp '".$term."'");
-			$terms[2] = Input::get('itemname');
-		}
-		if (Input::has('name')){
-			$term = Input::get('name');
-			$term = trim($term);
-			$term = str_replace(" ", "|", $term);
-			$query = $query->whereRaw("name regexp '".$term."'");
-			$terms[3] = Input::get('name');
-		}
-		if (Input::has('model')){
-			$term = Input::get('model');
-			$term = trim($term);
-			$term = str_replace(" ", "|", $term);
-			$query = $query->whereRaw("model regexp '".$term."'");
-			$terms[4] = Input::get('model');
-		}
-		if (Input::has('spec')){
-			$term = Input::get('spec');
-			$term = trim($term);
-			$term = str_replace(" ", "|", $term);
-			$query = $query->whereRaw("spec regexp '".$term."'");
-			$terms[5] = Input::get('spec');
-		}
-		if (Input::has('registrasi')){
-			$term = Input::get('registrasi');
-			$term = trim($term);
-			$term = str_replace(" ", "|", $term);
-			$query = $query->whereRaw("registrasi regexp '".$term."'");
-			$terms[6] = Input::get('registrasi');
-		}
-		if (Input::has('kurs')){
-			$term = Input::get('kurs');
-			$term = trim($term);
-			$term = str_replace(" ", "|", $term);
-			$query = $query->whereRaw("kurs regexp '".$term."'");
-			$terms[7] = Input::get('kurs');
-		}
-		if (Input::has('merek')){
-			if (Input::get('merek') != "Merek"){
-				$term = Input::get('merek');
-				$query = $query->whereRaw("merek = '".$term."'");
-				$terms[8] = Input::get('merek');
-			}
 		}
 
 		$jumlah = $query->count();
@@ -725,6 +699,8 @@ class BackController extends Controller {
 		// var_dump($merek);
 		// die();
 
+		$canRollback = Upload::where('status', '=', 1)->count();
+
 		//$this->rrmdir(storage_path('temp'));
 
 		try{
@@ -734,7 +710,7 @@ class BackController extends Controller {
 
 		}
 
-		return Theme::back('product')->with('products', $products)->with('pagination', $pagination)->with('terms', $terms)->with('jumlah', $jumlah)->with('merek', $merek)->with('salah', $salah)->with('new', $cNew)->with('update', $cUpdate)->with('success', true);
+		return Theme::back('product')->with('products', $products)->with('pagination', $pagination)->with('terms', $terms)->with('jumlah', $jumlah)->with('merek', $merek)->with('salah', $salah)->with('new', $cNew)->with('update', $cUpdate)->with('success', true)->with('canRollback', $canRollback);
 	}
 
 	public function getSung($a, $update){

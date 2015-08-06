@@ -44,6 +44,7 @@
             <li @if(Request::is('user*')) class="active" @endif ><a href="{{ action('BackController@user') }}"><span>User</span> <i class="icon-user"></i></a></li>  
             <li @if(Request::is('product*')) class="active" @endif ><a href="{{ URL('product') }}"><span>Product</span> <i class="icon-list"></i></a></li>  
             <li @if(Request::is('news*')) class="active" @endif ><a href="{{ action('BackController@news') }}"><span>News</span> <i class="icon-newspaper"></i></a></li>  
+            <li @if(Request::is('kurs*')) class="active" @endif ><a href="{{ URL('kurs') }}"><span>Kurs</span> <i class="icon-tag5"></i></a></li>  
         </ul>
         <!-- /main navigation -->
     </div>

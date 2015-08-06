@@ -34,7 +34,7 @@ User list
 @endif
 <div class="panel panel-default">
 	<div class="panel-heading">
-		<h6 class="panel-title"><i class="icon-paragraph-justify"></i> Striped &amp; bordered datatable</h6>
+		<h6 class="panel-title"><i class="icon-paragraph-justify"></i> User</h6>
 	</div>
 	<div class="datatable">
 		<table class="table table-striped table-bordered">

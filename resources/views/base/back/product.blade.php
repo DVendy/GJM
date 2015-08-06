@@ -41,6 +41,10 @@ Product list
 		<a data-toggle="modal" role="button" href="#modal-delete"><i class="icon-close"></i></a><span class="bottom-info bg-primary"></span>
 	</li>
 	<li class="bg-warning pull-right">
+		<div class="top-info"><a data-toggle="modal" role="button" href="#modal-rollback">Rollback</a><small>rollback data</small></div>
+		<a data-toggle="modal" role="button" href="#modal-rollback"><i class="icon-spinner8"></i></a><span class="bottom-info bg-primary"></span>
+	</li>
+	<li class="bg-success pull-right">
 		<div class="top-info"><a data-toggle="modal" role="button" href="{{ URL('getLastUpload') }}">Get Last Upload</a><small>get last uploaded/imported excel</small></div>
 		<a data-toggle="modal" role="button" href="{{ URL('getLastUpload') }}"><i class="icon-file-excel"></i></a><span class="bottom-info bg-primary"></span>
 	</li>
@@ -97,7 +101,7 @@ Product list
 </div>
 <div class="panel panel-default">
 	<div class="panel-heading">
-		<h6 class="panel-title"><i class="icon-paragraph-justify"></i> Striped &amp; bordered datatable</h6>
+		<h6 class="panel-title"><i class="icon-paragraph-justify"></i> Product</h6>
 		<h6 class="panel-title pull-right"><i class="icon-info"></i> {{ $jumlah }} data found</h6>
 	</div>
 	<div class="datatable">
@@ -240,6 +244,31 @@ Product list
 			<div class="modal-footer">
 				<button class="btn btn-warning" data-dismiss="modal"><i class="icon-cancel-circle"></i> Cancel</button>
 				<a class="btn btn-primary" href="{{ URL('empty') }}"><i class="icon-close"></i> Empty</a>
+			</div>
+			<div id="progress" style="text-align: center;"></div>
+		</div>
+	</div>
+</div>
+
+<div id="modal-rollback" class="modal fade" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title"><i class="icon-spinner8"></i> Rollback data</h4>
+			</div>
+			<div class="modal-body with-padding">
+			@if($canRollback == 1)
+				<h5><i class="icon-warning"></i> Data akan dikembalikan ke terakhir upload, anda yakin?</h5>
+			@else
+				<h5><i class="icon-warning"></i> Data tidak dapat dikembalikan ke terakhir upload.</h5>
+			@endif
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-warning" data-dismiss="modal"><i class="icon-cancel-circle"></i> Close</button>
+				@if($canRollback == 1)
+				<a class="btn btn-primary" href="{{ URL('rollback') }}"><i class="icon-spinner8"></i> Rollback</a>
+				@endif
 			</div>
 			<div id="progress" style="text-align: center;"></div>
 		</div>
