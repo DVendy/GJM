@@ -104,7 +104,7 @@ Product list
 		<h6 class="panel-title"><i class="icon-paragraph-justify"></i> Product</h6>
 		<h6 class="panel-title pull-right"><i class="icon-info"></i> {{ $jumlah }} data found</h6>
 	</div>
-	<div class="datatable">
+	<div class="datatable table-responsive">
 		<table class="table table-striped table-bordered">
 			<thead>
 				<tr>

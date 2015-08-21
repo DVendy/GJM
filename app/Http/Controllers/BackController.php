@@ -66,13 +66,11 @@ class BackController extends Controller {
 		$expired = Product::where('expired', '<=', $date_now)->paginate(100);
 
 		//expired dalam 6 bulan
-		$cExpired6 = Product::where('expired', '<=', $date_now->copy()->addMonths(6))->count();
+		$cExpired6 = Product::where('expired', '<=', $date_now->copy()->addMonths(6))->where('expired', '>=', $date_now)->count();
 		$expired6 = Product::where('expired', '<=', $date_now->copy()->addMonths(6))->where('expired', '>=', $date_now)->paginate(100);
 
 		//baru
 		$cNew = Product::where('status', '=', 3)->count();
-		//echo $cNew;
-
 		$new = Product::where('status', '=', 3)->paginate(100);
 
 		//baru
