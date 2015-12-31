@@ -57,7 +57,10 @@ class BackController extends Controller {
 		$product = Product::count();
 		$update = Upload::all()->first();
 		
-		$date = date_create_from_format('Y-m-d H:i:s', $update->date);
+		if ($update != null)
+			$date = date_create_from_format('Y-m-d H:i:s', $update->date);
+		else
+			$date = null;
 		//  var_dump($date);
 
 		$date_now = Carbon::now();
@@ -90,7 +93,7 @@ class BackController extends Controller {
 	 */
 	public function user()
 	{
-		$users = User::all();
+		$users = User::where("role", "marketing")->get();
 		return Theme::back('user')->with('users', $users);
 	} 
 
@@ -101,8 +104,6 @@ class BackController extends Controller {
 			'name' 	=> 'required||min:3',
 			'password' 		=> 'required||min:5',
 			'password2' => 'same:password',
-			'phone'=> 'required||min:3',
-			'email'	=> 'required||min:3',
 			'roles'	=> 'required',
 			));
 
@@ -112,8 +113,6 @@ class BackController extends Controller {
 				'name' 	=> 'required||min:3',
 				'password' 		=> 'required||min:5',
 				'password2' => 'same:password',
-				'phone'=> 'required||min:3',
-				'email'	=> 'required||min:3',
 				'roles'	=> 'required',
 				'create' => 'required',
 				));
@@ -436,8 +435,7 @@ class BackController extends Controller {
 		if ($p->spec != $v['spec']){
 				//echo $p->spec;
 					return false;}
-		if ($p->registrasi != $v['registrasi']){
-				//echo $p->registrasi;
+		if ($p->registrasi != $v['registrasi']->format('Y-m-d H:i:s')){
 					return false;}
 		if ($p->kurs != $v['kurs']){
 				//echo $p->kurs;
@@ -518,6 +516,10 @@ class BackController extends Controller {
 				$values[2] = $this->namaHash($values[2]);
 
 //semua data masukin ke $a
+				if ($values[8] == "NULL")
+					$values[8] = 0;
+				if ($values[6] == "NULL")
+					$values[6] = Carbon::create(2000, 1, 1, 0, 0, 0);
 				$a[] = [
 					'itemcode' => $values[0],
 					'itemname' => $values[1],
@@ -525,12 +527,12 @@ class BackController extends Controller {
 					'merek' => $values[3],
 					'model' => $values[4],
 					'spec' => $values[5],
-					'registrasi' => $values[6],
+					'registrasi' => null,
 					'kurs' => $values[7],
 					'price' => $values[8],
 					'lastupdate' => $date_now,
 					'created_at' => $date_now,
-					'expired' => $values[9],
+					'expired' => $values[6],
 					];
 			}else{
 				$salah[] = [$rowIndex, $values[0]];

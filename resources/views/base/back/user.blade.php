@@ -133,6 +133,7 @@ User list
 							@if ($errors->has('email')) <p class="help-block">{{ $errors->first('email') }}</p> @endif
 						</div>
 					</div>
+					<!--
 					&nbsp;
 					<div class="form-group">
 						<label class="col-sm-2 control-label">Role: </label>
@@ -145,6 +146,7 @@ User list
 							Marketing</label>
 						</div>
 					</div>
+					-->
 				</div>
 			</div>
 			<div class="modal-footer">
@@ -207,6 +209,7 @@ User list
 							@if ($errors->has('edit_email')) <p class="help-block">{{ $errors->first('edit_email') }}</p> @endif
 						</div>
 					</div>
+					<!--
 					&nbsp;
 					<div class="form-group">
 						<label class="col-sm-2 control-label">Role: </label>
@@ -219,6 +222,7 @@ User list
 							Marketing</label>
 						</div>
 					</div>
+					-->
 				</div>
 			</div>
 			<div class="modal-footer">

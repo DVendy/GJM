@@ -120,7 +120,7 @@ Product list
 					<th>Price</th>
 					<th>Created At</th>
 					<th>Last Updated</th>
-					<th>Expired</th>
+					<th>Status</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -133,12 +133,12 @@ Product list
 					<td>{{ $key->merek }}</td>
 					<td>{{ $key->model }}</td>
 					<td>{{ $key->spec }}</td>
-					<td>{{ $key->registrasi }}</td>
+					<td>{{ $key->expired }}</td>
 					<td>{{ $key->kurs }}</td>
 					<td>{{ $key->price }}</td>
 					<td>{{ $key->created_at }}</td>
 					<td>{{ $key->lastupdate }}</td>
-					<td>{{ $key->expired }}</td>
+					<td>{{ $key->status }}</td>
 				</tr>
 				@endforeach
 			</tbody>

@@ -32,7 +32,7 @@
 					<tbody>
 						<tr>
 							<td>{{ $product }}</td>
-							<td>{{ date_format($update, "l, d F Y") }}</td>
+							<td>@if ($update != null){{ date_format($update, "l, d F Y") }}@endif</td>
 						</tr>
 					</tbody>
 				</table>
