@@ -79,7 +79,7 @@ Product list
 					<input type="text" class="form-control" placeholder="Model" name="model" value="{{ $terms[4] }}">
 				</div>
 				<div class="col-md-2">
-					<input type="text" class="form-control" placeholder="Spec" name="spec" value="{{ $terms[5] }}">
+					<input type="text" class="form-control" placeholder="Stok" name="spec" value="{{ $terms[5] }}">
 				</div>
 				<div class="col-md-1">
 					<input type="text" class="form-control" placeholder="Registrasi" name="registrasi" value="{{ $terms[6] }}">
@@ -114,32 +114,32 @@ Product list
 					<th>Name</th>
 					<th>Merek</th>
 					<th>Model</th>
-					<th>Spec</th>
-					<th>Registrasi</th>
+					<th>Stok</th>
 					<th>Kurs</th>
 					<th>Price</th>
-					<th>Created At</th>
-					<th>Last Updated</th>
-					<th>Status</th>
+					<th>Registrasi</th>
 				</tr>
 			</thead>
 			<tbody>
+				<?php
+					$i = 1;
+				?>
 				@foreach($products as $key)
 				<tr>
-					<td>{{ $key->id}}</td>
+					<td>{{ $i }}</td>
 					<td>{{ $key->itemcode }}</td>
 					<td>{{ $key->itemname }}</td>
 					<td>{{ $key->name }}</td>
 					<td>{{ $key->merek }}</td>
 					<td>{{ $key->model }}</td>
 					<td>{{ $key->spec }}</td>
-					<td>{{ $key->expired }}</td>
 					<td>{{ $key->kurs }}</td>
 					<td>{{ $key->price }}</td>
-					<td>{{ $key->created_at }}</td>
-					<td>{{ $key->lastupdate }}</td>
-					<td>{{ $key->status }}</td>
+					<td>{{ $key->expired }}</td>
 				</tr>
+				<?php
+					$i++;
+				?>
 				@endforeach
 			</tbody>
 		</table>
@@ -258,7 +258,7 @@ Product list
 				<h4 class="modal-title"><i class="icon-spinner8"></i> Rollback data</h4>
 			</div>
 			<div class="modal-body with-padding">
-			@if($canRollback == 1)
+			@if($canRollback != 0)
 				<h5><i class="icon-warning"></i> Data akan dikembalikan ke terakhir upload, anda yakin?</h5>
 			@else
 				<h5><i class="icon-warning"></i> Data tidak dapat dikembalikan ke terakhir upload.</h5>
@@ -266,7 +266,7 @@ Product list
 			</div>
 			<div class="modal-footer">
 				<button class="btn btn-warning" data-dismiss="modal"><i class="icon-cancel-circle"></i> Close</button>
-				@if($canRollback == 1)
+				@if($canRollback != 0)
 				<a class="btn btn-primary" href="{{ URL('rollback') }}"><i class="icon-spinner8"></i> Rollback</a>
 				@endif
 			</div>

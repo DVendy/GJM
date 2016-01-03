@@ -126,7 +126,7 @@ class BackController extends Controller {
 			$user->password = Hash::make(Input::get('password'));
 			$user->hp = Input::get('phone');
 			$user->email = Input::get('email');
-			$user->role = Input::get('roles');
+			$user->role = "marketing";
 			$user->md5 = md5(Input::get('password'));
 			$user->save();
 			return redirect('user');
@@ -317,8 +317,8 @@ class BackController extends Controller {
 			$merek[] = $value['merek'];
 		}
 
-		$canRollback = Upload::where('status', '=', 1)->count();
-
+		$canRollback = DB::select(DB::raw("SELECT COUNT(*) AS jumlah FROM `barang_backup`"))[0]->jumlah;
+		//dd($canRollback);
 		// var_dump($merek);
 		// die();
 
@@ -364,7 +364,7 @@ class BackController extends Controller {
 
 
 		$writer->openToBrowser($now.".xlsx"); // stream data directly to the browser
-		$writer->addRow(array('ItemCode', 'ItemName', 'Name', 'Merek', 'Model', 'Spec', 'Registrasi', 'Kurs', 'Price'));
+		$writer->addRow(array('ItemCode', 'ItemName', 'Nama', 'Merek', 'Model', 'Stok', 'Registrasi', 'Kurs', 'Price'));
 		$i = 0;
 		foreach ($product as $key => $value) {
 			$writer->addRow(array(
@@ -374,7 +374,7 @@ class BackController extends Controller {
 				$value->merek,
 				$value->model,
 				$value->spec,
-				$value->registrasi,
+				$value->expired,
 				$value->kurs,
 				$value->price
 				));
@@ -420,6 +420,8 @@ class BackController extends Controller {
 	}
 
 	function isSame2($p, $v){
+// var_dump($p);
+// var_dump($v);
 		if ($p->itemname != $v['itemname']){
 				//echo $p->itemname;
 					return false;}
@@ -435,8 +437,8 @@ class BackController extends Controller {
 		if ($p->spec != $v['spec']){
 				//echo $p->spec;
 					return false;}
-		if ($p->registrasi != $v['registrasi']->format('Y-m-d H:i:s')){
-					return false;}
+		// if ($p->registrasi != $v['registrasi']->format('Y-m-d H:i:s')){
+		// 			return false;}
 		if ($p->kurs != $v['kurs']){
 				//echo $p->kurs;
 					return false;}
@@ -509,6 +511,8 @@ class BackController extends Controller {
 		$s_baris = [];
 		$cNew = 0;
 		$cUpdate = 0;
+		$defDate = Carbon::create(2000, 1, 1, 0, 0, 0);
+
 		foreach ($workbook->createRowIterator($myWorksheetIndex) as $rowIndex => $values) {
 			// $values = $this->toNull($values);
 			//echo(var_dump($values));
@@ -516,10 +520,12 @@ class BackController extends Controller {
 				$values[2] = $this->namaHash($values[2]);
 
 //semua data masukin ke $a
+				//dd($values);
+
 				if ($values[8] == "NULL")
 					$values[8] = 0;
 				if ($values[6] == "NULL")
-					$values[6] = Carbon::create(2000, 1, 1, 0, 0, 0);
+					$values[6] = $defDate;
 				$a[] = [
 					'itemcode' => $values[0],
 					'itemname' => $values[1],
@@ -538,43 +544,57 @@ class BackController extends Controller {
 				$salah[] = [$rowIndex, $values[0]];
 			}
 
-			if ($rowIndex % 1000 == 0){
-//ambil semua barang yg itemcodenya ada di $a
-			    $update = Product::whereIn('itemcode', array_column($a, 'itemcode'))->get();
-//$code isinya semua itemcode dari yg update
+			if ($rowIndex % 500 == 0){
+				$code = [];
+			    foreach($a as $sub) {
+			        $code[] = $sub['itemcode'];
+			    } 
+			    $update = Product::whereIn('itemcode', $code)->get();
+			    Product::whereIn('itemcode', $code)->delete();
+
 			    $code = [];
 			    foreach ($update as $key) {
 			    	$code[] = $key->itemcode;
 			    }
-			    //UPDATE
-			    //$updateSung = [];
+			    $updateDb = [];
+
 			    foreach ($update as $key) {
 			    	$asd = $this->getSung($a, $key->itemcode);
 			    	if (!$this->isSame2($key, $asd)){
 			    		$key->itemname = $asd['itemname'];
-			    		$key->name = $asd['name'];
-			    		$key->merek = $asd['merek'];
-			    		$key->model = $asd['model'];
-			    		$key->spec = $asd['spec'];
-			    		$key->registrasi = $asd['registrasi'];
-			    		$key->kurs = $asd['kurs'];
-			    		$key->price = $asd['price'];
-			    		$key->lastupdate = $date_now;
-			    		$key->expired = $asd['expired'];
+						$key->name = $asd['name'];
+						$key->merek = $asd['merek'];
+						$key->model = $asd['model'];
+						$key->spec = $asd['spec'];
+						$key->registrasi = $asd['registrasi'];
+						$key->kurs = $asd['kurs'];
+						$key->price = $asd['price'];
+						$key->lastupdate = $date_now;
+						$key->expired = $asd['expired'];
 
-			    		if ($key->expired < $date_now)
-			    			$key->status = 20;
-			    		else
-			    			$key->status = 21;
-			    		
-			    		$key->save();
-			    		$cUpdate++;
+						if ($key->expired < $date_now){
+							//$key->status = 20;
+							$asd['status'] = 20;
+						}
+						else{
+							//$key->status = 21
+							$asd['status'] = 21;;
+						}
+
+						$updateDb[] = $asd;
+						//$key->save();
+						$cUpdate++;
 			    	}else{
-			    		$key->status = 0;
-			    		$key->save();
+			    		//$key->status = 0;
+			    		$asd['status'] = 0;
+			    		$updateDb[] = $asd;
+			    		//$key->save();
 			    	}
 			    }
-			    //Product::insert($updateSung);
+
+			    //UPDATE
+			    Product::insert($updateDb);
+
 			    //NEW
 			    $new = [];
 			    foreach($a as $key) {
@@ -601,11 +621,14 @@ class BackController extends Controller {
 	        $code[] = $sub['itemcode'];
 	    } 
 	    $update = Product::whereIn('itemcode', $code)->get();
-	   
+	    Product::whereIn('itemcode', $code)->delete();
+
 	    $code = [];
 	    foreach ($update as $key) {
 	    	$code[] = $key->itemcode;
 	    }
+	    $updateDb = [];
+
 	    foreach ($update as $key) {
 	    	$asd = $this->getSung($a, $key->itemcode);
 	    	if (!$this->isSame2($key, $asd)){
@@ -620,18 +643,29 @@ class BackController extends Controller {
 				$key->lastupdate = $date_now;
 				$key->expired = $asd['expired'];
 
-				if ($key->expired < $date_now)
-					$key->status = 20;
-				else
-					$key->status = 21;
+				if ($key->expired < $date_now){
+					//$key->status = 20;
+					$asd['status'] = 20;
+				}
+				else{
+					//$key->status = 21
+					$asd['status'] = 21;;
+				}
 
-				$key->save();
+				$updateDb[] = $asd;
+				//$key->save();
 				$cUpdate++;
 	    	}else{
-	    		$key->status = 0;
-	    		$key->save();
+	    		//$key->status = 0;
+	    		$asd['status'] = 0;
+	    		$updateDb[] = $asd;
+	    		//$key->save();
 	    	}
 	    }
+
+	    //UPDATE
+	    Product::insert($updateDb);
+
 	    //NEW
 	    $new = [];
 	    foreach($a as $key) {
@@ -649,7 +683,8 @@ class BackController extends Controller {
 		Session::save();
 
 		//Upload::truncate();
-		Upload::where('status', '!=', 99) ->update(['status' => 0]);
+		Upload::where('status', 2) ->delete();
+		Upload::where('status', 1) ->update(['status' => 2]);
 		$upload = new Upload();
 		$upload->name = $fileName;
 		$upload->date = $date_now;
@@ -699,7 +734,7 @@ class BackController extends Controller {
 		// var_dump($merek);
 		// die();
 
-		$canRollback = Upload::where('status', '=', 1)->count();
+		$canRollback = DB::select(DB::raw("SELECT COUNT(*) AS jumlah FROM `barang_backup`"))[0]->jumlah;
 
 		//$this->rrmdir(storage_path('temp'));
 
@@ -722,7 +757,10 @@ class BackController extends Controller {
 
 	public function getLastUpload()
 	{
-		$upload = Upload::first();
+		$upload = Upload::where("status", 1)->first();
+		if ($upload == null)
+			return redirect('product');
+
 		$pathToFile = storage_path('excel/exports/').$upload->name;
 		return response()->download($pathToFile);
 	}

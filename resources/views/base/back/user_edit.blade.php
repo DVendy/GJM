@@ -88,6 +88,7 @@ Update profile
 			</div>
 		</div>
 		&nbsp;
+		<!--
 		<div class="form-group">
 			<label class="col-sm-2 control-label">Role: </label>
 			<div class="col-sm-10">
@@ -102,6 +103,7 @@ Update profile
 				@endif
 			</div>
 		</div>
+		-->
 		<div class="form-actions text-right" style="margin-right:15px;">
 			<button type="submit" class="btn btn-success"><i class="icon-pencil3"></i> Update</button>
 		</div>

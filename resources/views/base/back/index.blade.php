@@ -64,13 +64,10 @@
 								<th>Name</th>
 								<th>Merek</th>
 								<th>Model</th>
-								<th>Spec</th>
-								<th>Registrasi</th>
+								<th>Stok</th>
 								<th>Kurs</th>
 								<th>Price</th>
-								<th>Created At</th>
-								<th>Last Updated</th>
-								<th>Expired</th>
+								<th>Registrasi</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -86,11 +83,8 @@
 								<td>{{ $key->merek }}</td>
 								<td>{{ $key->model }}</td>
 								<td>{{ $key->spec }}</td>
-								<td>{{ $key->registrasi }}</td>
 								<td>{{ $key->kurs }}</td>
 								<td>{{ $key->price }}</td>
-								<td>{{ $key->created_at }}</td>
-								<td>{{ $key->lastupdate }}</td>
 								<td>{{ $key->expired }}</td>
 							</tr>
 							<?php
@@ -121,13 +115,10 @@
 								<th>Name</th>
 								<th>Merek</th>
 								<th>Model</th>
-								<th>Spec</th>
-								<th>Registrasi</th>
+								<th>Stok</th>
 								<th>Kurs</th>
 								<th>Price</th>
-								<th>Created At</th>
-								<th>Last Updated</th>
-								<th>Expired</th>
+								<th>Registrasi</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -143,11 +134,8 @@
 								<td>{{ $key->merek }}</td>
 								<td>{{ $key->model }}</td>
 								<td>{{ $key->spec }}</td>
-								<td>{{ $key->registrasi }}</td>
 								<td>{{ $key->kurs }}</td>
 								<td>{{ $key->price }}</td>
-								<td>{{ $key->created_at }}</td>
-								<td>{{ $key->lastupdate }}</td>
 								<td>{{ $key->expired }}</td>
 							</tr>
 							<?php
@@ -178,13 +166,10 @@
 								<th>Name</th>
 								<th>Merek</th>
 								<th>Model</th>
-								<th>Spec</th>
-								<th>Registrasi</th>
+								<th>Stok</th>
 								<th>Kurs</th>
 								<th>Price</th>
-								<th>Created At</th>
-								<th>Last Updated</th>
-								<th>Expired</th>
+								<th>Registrasi</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -200,11 +185,8 @@
 								<td>{{ $key->merek }}</td>
 								<td>{{ $key->model }}</td>
 								<td>{{ $key->spec }}</td>
-								<td>{{ $key->registrasi }}</td>
 								<td>{{ $key->kurs }}</td>
 								<td>{{ $key->price }}</td>
-								<td>{{ $key->created_at }}</td>
-								<td>{{ $key->lastupdate }}</td>
 								<td>{{ $key->expired }}</td>
 							</tr>
 							<?php
@@ -235,13 +217,10 @@
 								<th>Name</th>
 								<th>Merek</th>
 								<th>Model</th>
-								<th>Spec</th>
-								<th>Registrasi</th>
+								<th>Stok</th>
 								<th>Kurs</th>
 								<th>Price</th>
-								<th>Created At</th>
-								<th>Last Updated</th>
-								<th>Expired</th>
+								<th>Registrasi</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -257,11 +236,8 @@
 								<td>{{ $key->merek }}</td>
 								<td>{{ $key->model }}</td>
 								<td>{{ $key->spec }}</td>
-								<td>{{ $key->registrasi }}</td>
 								<td>{{ $key->kurs }}</td>
 								<td>{{ $key->price }}</td>
-								<td>{{ $key->created_at }}</td>
-								<td>{{ $key->lastupdate }}</td>
 								<td>{{ $key->expired }}</td>
 							</tr>
 							<?php
