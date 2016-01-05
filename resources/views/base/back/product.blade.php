@@ -17,7 +17,12 @@ Product list
 @stop
 
 @section('body')
-
+    	@if(Session::has('fail'))
+    	<div class="alert alert-danger fade in block-inner">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <i class="icon-closeicon"></i> Username atau Password salah.
+        </div>
+        @endif
 <div class="breadcrumb-line">
 	<ul class="breadcrumb">
 		<li><a href="{{ URL('/') }}">Home</a></li>

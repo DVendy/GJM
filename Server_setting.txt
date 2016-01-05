@@ -1,3 +1,7 @@
 apache : rewrite module
-php : memory limit, time lilit, max upload & post
+php : memory limit, time limit, max upload & post
 www/index.php : suppress localhost
+
+vendor: Archive.php
+$this->tempPath = tempnam(storage_path('temp'), 'xls_parser_archive'); //baris 39
+komen baris 67
