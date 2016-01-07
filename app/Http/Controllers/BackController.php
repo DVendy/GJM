@@ -103,8 +103,7 @@ class BackController extends Controller {
 			'username' 	=> 'required||unique:users',
 			'name' 	=> 'required||min:3',
 			'password' 		=> 'required||min:5',
-			'password2' => 'same:password',
-			'roles'	=> 'required',
+			'password2' => 'same:password'
 			));
 
 		if ($validate -> fails()){
@@ -113,7 +112,6 @@ class BackController extends Controller {
 				'name' 	=> 'required||min:3',
 				'password' 		=> 'required||min:5',
 				'password2' => 'same:password',
-				'roles'	=> 'required',
 				'create' => 'required',
 				));
 			return redirect('user')->withErrors($validate)->withInput();
@@ -140,7 +138,6 @@ class BackController extends Controller {
 			'edit_password' 		=> 'required||min:5',
 			'edit_phone'=> 'required||min:3',
 			'edit_email'	=> 'required||min:3',
-			'edit_roles'	=> 'required',
 			));
 
 		if ($validate -> fails()){
@@ -149,7 +146,6 @@ class BackController extends Controller {
 				'edit_password' 		=> 'required||min:5',
 				'edit_phone'=> 'required||min:3',
 				'edit_email'	=> 'required||min:3',
-				'edit_roles'	=> 'required',
 				'update' => 'required',
 				));
 			return redirect('user')->withErrors($validate)->withInput();
@@ -160,7 +156,6 @@ class BackController extends Controller {
 			$user->password = Hash::make(Input::get('edit_password'));
 			$user->hp = Input::get('edit_phone');
 			$user->email = Input::get('edit_email');
-			$user->role = Input::get('edit_roles');
 			$user->md5 = md5(Input::get('edit_password'));
 			$user->save();
 			return redirect('user');
@@ -348,7 +343,7 @@ class BackController extends Controller {
 
 	public function export_spout(){		
 		set_time_limit(0);
-		$product = Product::all();
+		//$product = Product::all();
 // 		echo("mem. " . memory_get_usage()/1000000 . " MB <br>");
 // die("LOL");
 		$count = Product::count();
@@ -366,24 +361,28 @@ class BackController extends Controller {
 		$writer->openToBrowser($now.".xlsx"); // stream data directly to the browser
 		$writer->addRow(array('ItemCode', 'ItemName', 'Nama', 'Merek', 'Model', 'Stok', 'Registrasi', 'Kurs', 'Price'));
 		$i = 0;
-		foreach ($product as $key => $value) {
-			$writer->addRow(array(
-				$value->itemcode,
-				$value->itemname,
-				$value->name,
-				$value->merek,
-				$value->model,
-				$value->spec,
-				$value->expired,
-				$value->kurs,
-				$value->price
-				));
-			if ($i % 456 == 0){
-				Session::put('progress_export', round(($i / $count * 100),2). " %");
-				Session::save();
+
+		DB::table('barang')->chunk(1000, function($product) use (&$writer, &$i, &$count)
+		{
+			foreach ($product as $key => $value) {
+				$writer->addRow(array(
+					$value->itemcode,
+					$value->itemname,
+					$value->name,
+					$value->merek,
+					$value->model,
+					$value->spec,
+					$value->expired,
+					$value->kurs,
+					$value->price
+					));
+				if ($i % 456 == 0){
+					Session::put('progress_export', round(($i / $count * 100),2). " %");
+					Session::save();
+				}
+				$i++;
 			}
-			$i++;
-		}
+		});
 
 		$writer->close();
 		// echo("mem. " . memory_get_usage()/1000000 . " MB <br>");
@@ -517,6 +516,7 @@ class BackController extends Controller {
 			// $values = $this->toNull($values);
 			//echo(var_dump($values));
 			if (($values[0] != "") && ($values[0] != "ItemCode") && (!strpos($values[0], "'") !== false) && (!strpos($values[0], '"') !== false) && (!strpos($values[0], '\\') !== false)){
+				
 				$values[2] = $this->namaHash($values[2]);
 
 //semua data masukin ke $a
@@ -526,6 +526,7 @@ class BackController extends Controller {
 					$values[8] = 0;
 				if ($values[6] == "NULL")
 					$values[6] = $defDate;
+
 				$a[] = [
 					'itemcode' => $values[0],
 					'itemname' => $values[1],
@@ -533,7 +534,7 @@ class BackController extends Controller {
 					'merek' => $values[3],
 					'model' => $values[4],
 					'spec' => $values[5],
-					'registrasi' => null,
+					'registrasi' => "-",
 					'kurs' => $values[7],
 					'price' => $values[8],
 					'lastupdate' => $date_now,

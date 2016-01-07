@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 03, 2016 at 04:23 PM
+-- Generation Time: Jan 05, 2016 at 10:56 AM
 -- Server version: 5.6.17
 -- PHP Version: 5.5.12
 
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `barang` (
   `model` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `registrasi` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `kurs` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `price` decimal(10,2) NOT NULL,
+  `price` decimal(20,2) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `lastupdate` datetime NOT NULL,
@@ -164,7 +164,16 @@ CREATE TABLE IF NOT EXISTS `users` (
   `md5` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_username_unique` (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=5 ;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `username`, `password`, `role`, `remember_token`, `created_at`, `updated_at`, `hp`, `email`, `md5`) VALUES
+(1, 'admin', 'admin', '$2y$10$u.2EfL0BtCduU3tjIDBdDud3XDnY/86j.0bLpAhc/Ylu7ST560W0C', 'admin', NULL, '2016-01-04 03:24:29', '2016-01-04 03:24:29', '', '', '96e79218965eb72c92a549dd5a330112'),
+(2, 'marketwadasda', 'market', '$2y$10$ooQYnUJDnpc7TnfpOS7ioO6um0g8rXxI/6pD8iz082uvmrw72uNMq', 'marketing', NULL, '2016-01-05 06:33:53', '2016-01-05 06:34:41', '13241324', '13241324', '96e79218965eb72c92a549dd5a330112'),
+(4, 'market 2', 'market2', '$2y$10$EzA3rkKxwdx67i4RRpTtCuxR.9XaCeIHa1vC9bB.P8ggC8Fdya/1u', 'marketing', NULL, '2016-01-05 07:06:24', '2016-01-05 07:06:24', '1242e', '3r3r', '96e79218965eb72c92a549dd5a330112');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
