@@ -63,7 +63,7 @@ Product list
 		<input type="hidden" name="_token" value="{{ csrf_token() }}">
 		<div class="panel-body">
 			<div class="form-group" style="margin-right: -15px; margin-bottom: 50px;">
-				<div class="col-md-1">
+				<div class="col-md-2">
 					<input type="text" class="form-control" placeholder="Item Code" name="code" value="{{ $terms[0] }}">
 				</div>
 				<div class="col-md-2">
@@ -83,13 +83,10 @@ Product list
 				<div class="col-md-1">
 					<input type="text" class="form-control" placeholder="Model" name="model" value="{{ $terms[4] }}">
 				</div>
-				<div class="col-md-2">
+				<div class="col-md-1">
 					<input type="text" class="form-control" placeholder="Stok" name="spec" value="{{ $terms[5] }}">
 				</div>
-				<div class="col-md-1">
-					<input type="text" class="form-control" placeholder="Registrasi" name="registrasi" value="{{ $terms[6] }}">
-				</div>
-				<div class="col-md-1">
+				<div class="col-md-2">
 					<input type="text" class="form-control" placeholder="Kurs" name="kurs" value="{{ $terms[7] }}">
 				</div>
 				<div class="col-md-1">

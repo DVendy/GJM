@@ -148,7 +148,7 @@ Kurs
 					<div class="form-group @if ($errors->has('value')) has-error @endif">
 						<label class="col-sm-2 control-label">Value: </label>
 						<div class="col-sm-10">
-							<input type="text" class="form-control i_value" name="value" value="{{ Input::old('value') }}" onkeypress="return isNumberKey(this, event)">
+							<input type="text" class="form-control i_value" name="value" value="{{ Input::old('value') }}" onkeypress="return isNumberKey(this, event)" id="x_value">
 							@if ($errors->has('value')) <p class="help-block">{{ $errors->first('value') }}</p> @endif
 						</div>
 					</div>
@@ -156,7 +156,7 @@ Kurs
 			</div>
 			<div class="modal-footer">
 				<button class="btn btn-warning" type="button" data-dismiss="modal"><i class="icon-cancel-circle"></i> Cancel</button>
-				<button class="btn btn-primary" type="submit" value="Import" id="form-overview"><i class="icon-download2"></i> Create</button>
+				<button class="btn btn-primary" type="submit" value="Import" id="form-overview" onclick="removeComma();"><i class="icon-download2"></i> Create</button>
 			</div>
 			</form>
 		</div>
@@ -202,7 +202,7 @@ Kurs
 			</div>
 			<div class="modal-footer">
 				<button class="btn btn-warning" type="button" data-dismiss="modal"><i class="icon-cancel-circle"></i> Cancel</button>
-				<button class="btn btn-primary" type="submit" value="Import" id="form-overview"><i class="icon-pencil4"></i> Update</button>
+				<button class="btn btn-primary" type="submit" value="Import" id="form-overview" onclick="removeComma();"><i class="icon-pencil4"></i> Update</button>
 			</div>
 			</form>
 		</div>
@@ -287,6 +287,14 @@ function numberWithCommas(x) {
     var parts = x.toString().split(".");
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     return parts.join(".");
+}
+
+function removeComma(){
+	var elem = document.getElementById("x_value");
+	elem.value = elem.value.replace(/,/g,'');
+
+	elem = document.getElementById("edit_value");
+	elem.value = elem.value.replace(/,/g,'');
 }
 </script>
 @stop

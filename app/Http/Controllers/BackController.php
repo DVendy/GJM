@@ -430,9 +430,30 @@ class BackController extends Controller {
 		if ($p->merek != $v['merek']){
 				//echo $p->description;
 					return false;}
-		if ($p->model != $v['model']){
-				//echo $p->model;
-					return false;}
+
+		if(gettype($v['model']) != "object"){
+			if ($p->model != $v['model']){
+				return false;
+			}
+		}else{
+			//var_dump($v['model']);
+			if ($p->model != $v['model']->format('Y-m-d H:i:s')){
+				return false;
+			}
+		}
+
+		// if ($p->model != $v['model']){
+		// 	try{
+		// 		if (strtotime($p->model) == strtotime($v['model'])){
+		// 			return true;
+		// 		}
+		// 	}catch(\Exception $e){
+		// 		return false;
+		// 	}
+		// 	return false;
+		// }
+
+
 		if ($p->spec != $v['spec']){
 				//echo $p->spec;
 					return false;}
@@ -463,12 +484,12 @@ class BackController extends Controller {
 	{
 		$time1 = microtime(true);
 		$validate = Validator::make(Input::all(), array(
-			'file' 	=> 'required||mimes:xlsx',
+			'file' 	=> 'required',
 			));
 
 		if ($validate -> fails()){
 			$validate = Validator::make(Input::all(), array(
-				'file' 	=> 'required||mimes:xlsx',
+				'file' 	=> 'required',
 				'error' => 'required',
 				));
 			return redirect('product')->withErrors($validate)->withInput();
@@ -562,24 +583,24 @@ class BackController extends Controller {
 			    foreach ($update as $key) {
 			    	$asd = $this->getSung($a, $key->itemcode);
 			    	if (!$this->isSame2($key, $asd)){
-			    		$key->itemname = $asd['itemname'];
-						$key->name = $asd['name'];
-						$key->merek = $asd['merek'];
-						$key->model = $asd['model'];
-						$key->spec = $asd['spec'];
-						$key->registrasi = $asd['registrasi'];
-						$key->kurs = $asd['kurs'];
-						$key->price = $asd['price'];
-						$key->lastupdate = $date_now;
-						$key->expired = $asd['expired'];
+			   //  		$key->itemname = $asd['itemname'];
+						// $key->name = $asd['name'];
+						// $key->merek = $asd['merek'];
+						// $key->model = $asd['model'];
+						// $key->spec = $asd['spec'];
+						// $key->registrasi = $asd['registrasi'];
+						// $key->kurs = $asd['kurs'];
+						// $key->price = $asd['price'];
+						// $key->lastupdate = $date_now;
+						// $key->expired = $asd['expired'];
 
-						if ($key->expired < $date_now){
+						if ($asd['expired']< $date_now){
 							//$key->status = 20;
 							$asd['status'] = 20;
 						}
 						else{
 							//$key->status = 21
-							$asd['status'] = 21;;
+							$asd['status'] = 21;
 						}
 
 						$updateDb[] = $asd;
@@ -588,6 +609,7 @@ class BackController extends Controller {
 			    	}else{
 			    		//$key->status = 0;
 			    		$asd['status'] = 0;
+			    		$asd['lastupdate'] = $key->lastupdate;
 			    		$updateDb[] = $asd;
 			    		//$key->save();
 			    	}
@@ -633,24 +655,24 @@ class BackController extends Controller {
 	    foreach ($update as $key) {
 	    	$asd = $this->getSung($a, $key->itemcode);
 	    	if (!$this->isSame2($key, $asd)){
-	    		$key->itemname = $asd['itemname'];
-				$key->name = $asd['name'];
-				$key->merek = $asd['merek'];
-				$key->model = $asd['model'];
-				$key->spec = $asd['spec'];
-				$key->registrasi = $asd['registrasi'];
-				$key->kurs = $asd['kurs'];
-				$key->price = $asd['price'];
-				$key->lastupdate = $date_now;
-				$key->expired = $asd['expired'];
+	   //  		$key->itemname = $asd['itemname'];
+				// $key->name = $asd['name'];
+				// $key->merek = $asd['merek'];
+				// $key->model = $asd['model'];
+				// $key->spec = $asd['spec'];
+				// $key->registrasi = $asd['registrasi'];
+				// $key->kurs = $asd['kurs'];
+				// $key->price = $asd['price'];
+				// $key->lastupdate = $date_now;
+				// $key->expired = $asd['expired'];
 
-				if ($key->expired < $date_now){
+				if ($asd['expired']< $date_now){
 					//$key->status = 20;
 					$asd['status'] = 20;
 				}
 				else{
 					//$key->status = 21
-					$asd['status'] = 21;;
+					$asd['status'] = 21;
 				}
 
 				$updateDb[] = $asd;
@@ -659,6 +681,7 @@ class BackController extends Controller {
 	    	}else{
 	    		//$key->status = 0;
 	    		$asd['status'] = 0;
+	    		$asd['lastupdate'] = $key->lastupdate;
 	    		$updateDb[] = $asd;
 	    		//$key->save();
 	    	}
@@ -685,8 +708,14 @@ class BackController extends Controller {
 
 		//Upload::truncate();
 		$old = Upload::where('status', 2)->first();
-		unlink(storage_path('excel/exports')."/".$old->name);
-		$old->delete();
+		if ($old != null){
+			try{
+				unlink(storage_path('excel/exports')."/".$old->name);
+			}catch(\Exception $e){
+
+			}
+			$old->delete();
+		}
 
 		Upload::where('status', 1)->update(['status' => 2]);
 		$upload = new Upload();
